@@ -59,24 +59,37 @@ class Integrai_Core_Model_Observer
     public function salesOrderPlaceAfter(Varien_Event_Observer $observer)
     {
         if ($this->_getHelper()->isEventEnabled(self::NEW_ORDER)) {
-            $this->_getHelper()->log('salesOrderPlaceAfter', $observer->getEvent()->getResut());
-            return $this->_getApi()->sendEvent(self::NEW_ORDER, $observer->getEvent()->getResut());
+            /* @var Mage_Sales_Model_Order $order */
+            $order = $observer->getOrder();
+
+            $data = new Varien_Object();
+            $data->setOrder($order->getData());
+            $data->setCustomer($order->getCustomer()->getData());
+            $data->setBillingAddress($order->getBillingAddress()->getData());
+            $data->setShippingAddress($order->getShippingAddress()->getData());
+            $data->setPayment($order->getPayment()->getData());
+            $data->setShippingMethod($order->getShippingMethod());
+            $data->setShippingMethodDetail($order->getShippingMethod(true));
+
+            return $this->_getApi()->sendEvent(self::NEW_ORDER, $data->getData());
         }
     }
 
     public function salesOrderBeforeSave(Varien_Event_Observer $observer)
     {
         if ($this->_getHelper()->isEventEnabled(self::SAVE_ORDER)) {
-            $this->_getHelper()->log('salesOrderBeforeSave', $observer->getEvent()->getResut());
-            return $this->_getApi()->sendEvent(self::SAVE_ORDER, $observer->getEvent()->getResut());
+            /* @var Mage_Sales_Model_Order $order */
+            $order = $observer->getOrder();
+            return $this->_getApi()->sendEvent(self::SAVE_ORDER, $order->getData());
         }
     }
 
     public function orderCancelAfter(Varien_Event_Observer $observer)
     {
         if ($this->_getHelper()->isEventEnabled(self::CANCEL_ORDER)) {
-            $this->_getHelper()->log('orderCancelAfter', $observer->getEvent()->getResut());
-            return $this->_getApi()->sendEvent(self::CANCEL_ORDER, $observer->getEvent()->getResut());
+            /* @var Mage_Sales_Model_Order $order */
+            $order = $observer->getOrder();
+            return $this->_getApi()->sendEvent(self::CANCEL_ORDER, $order->getData());
         }
     }
 
@@ -91,8 +104,9 @@ class Integrai_Core_Model_Observer
     public function checkoutSubmitAllAfter(Varien_Event_Observer $observer)
     {
         if ($this->_getHelper()->isEventEnabled(self::FINALIZE_CHECKOUT)) {
-            $this->_getHelper()->log('checkoutSubmitAllAfter', $observer->getEvent()->getResut());
-            return $this->_getApi()->sendEvent(self::FINALIZE_CHECKOUT, $observer->getEvent()->getResut());
+            /* @var Mage_Sales_Model_Order $order */
+            $order = $observer->getOrder();
+            return $this->_getApi()->sendEvent(self::FINALIZE_CHECKOUT, $order->getData());
         }
     }
 
