@@ -1,0 +1,54 @@
+<?xml version="1.0" ?>
+
+<config>
+    <tabs>
+        <integrai translate="label" module="core">
+            <label>IntegrAi</label>
+            <sort_order>0</sort_order>
+        </integrai>
+    </tabs>
+    <sections>
+        <integrai_core translate="label" module="core">
+            <label>Configurações</label>
+            <tab>integrai</tab>
+            <sort_order>0</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <general translate="label" module="core">
+                    <label>Configurações de integração</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>1000</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <enable translate="label">
+                            <label>Habilitar: </label>
+                            <comment>Habilitar integraçào com IntegrAi.</comment>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                        </enable>
+                        <api_key translate="label">
+                            <label>API Key: </label>
+                            <comment>Sua API Key criadas no dashboard da IntegrAi</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                        </api_key>
+                        <secret_key translate="label">
+                            <label>Secret Key: </label>
+                            <comment>Sua Secret Key criadas no dashboard da IntegrAi</comment>
+                            <frontend_type>password</frontend_type>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                        </secret_key>
+                    </fields>
+                </general>
+            </groups>
+        </integrai_core>
+    </sections>
+</config>

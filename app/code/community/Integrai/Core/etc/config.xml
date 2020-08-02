@@ -1,0 +1,153 @@
+<?xml version="1.0" ?>
+
+<config>
+    <modules>
+        <Integrai_Core>
+            <version>1.0.0</version>
+        </Integrai_Core>
+    </modules>
+
+    <global>
+        <models>
+            <integrai>
+                <class>Integrai_Core_Model</class>
+                <resourceModel>integrai_resource</resourceModel>
+            </integrai>
+            <integrai_resource>
+                <class>Integrai_Core_Model_Resource</class>
+                <entities>
+                    <config>
+                        <table>integrai_config</table>
+                    </config>
+                </entities>
+            </integrai_resource>
+        </models>
+
+        <helpers>
+            <integrai>
+                <class>Integrai_Core_Helper</class>
+            </integrai>
+        </helpers>
+
+        <resources>
+            <integrai_setup>
+                <setup>
+                    <module>Integrai_Core</module>
+                    <class>Mage_Sales_Model_Resource_Setup</class>
+                </setup>
+            </integrai_setup>
+        </resources>
+
+        <events>
+            <!-- criação de conta de usuário -->
+            <customer_register_success>
+                <observers>
+                    <observer>
+                        <class>Integrai_Core_Model_Observer</class>
+                        <method>customerRegisterSuccess</method>
+                    </observer>
+                </observers>
+            </customer_register_success>
+
+            <!-- assinatura da newsletter -->
+            <newsletter_subscriber_save_after>
+                <observers>
+                    <observer>
+                        <class>Integrai_Core_Model_Observer</class>
+                        <method>newsletterSubscriberSaveAfter</method>
+                    </observer>
+                </observers>
+            </newsletter_subscriber_save_after>
+
+            <!-- adicionar produto ao carrinho -->
+            <checkout_cart_product_add_after>
+                <observers>
+                    <observer>
+                        <class>Integrai_Core_Model_Observer</class>
+                        <method>checkoutCartProductAddAfter</method>
+                    </observer>
+                </observers>
+            </checkout_cart_product_add_after>
+
+            <!-- criação de pedido -->
+            <sales_order_place_after>
+                <observers>
+                    <observer>
+                        <class>Integrai_Core_Model_Observer</class>
+                        <method>salesOrderPlaceAfter</method>
+                    </observer>
+                </observers>
+            </sales_order_place_after>
+
+            <!-- antes de salvar pedido -->
+            <sales_order_save_before>
+                <observers>
+                    <observer>
+                        <class>Integrai_Core_Model_Observer</class>
+                        <method>salesOrderBeforeSave</method>
+                    </observer>
+                </observers>
+            </sales_order_save_before>
+
+            <!-- cancelar pedido -->
+            <order_cancel_after>
+                <observers>
+                    <observer>
+                        <class>Integrai_Core_Model_Observer</class>
+                        <method>orderCancelAfter</method>
+                    </observer>
+                </observers>
+            </order_cancel_after>
+
+            <!-- reembolso de invoice -->
+            <sales_order_creditmemo_save_after>
+                <observers>
+                    <observer>
+                        <class>Integrai_Core_Model_Observer</class>
+                        <method>creditMemoRefundAfterSave</method>
+                    </observer>
+                </observers>
+            </sales_order_creditmemo_save_after>
+
+            <!-- finaliza checkout -->
+            <checkout_submit_all_after>
+                <observers>
+                    <observer>
+                        <class>Integrai_Core_Model_Observer</class>
+                        <method>checkoutSubmitAllAfter</method>
+                    </observer>
+                </observers>
+            </checkout_submit_all_after>
+
+<!--            <payment_method_is_active>-->
+<!--                <observers>-->
+<!--                    <observer>-->
+<!--                        <class>Integrai_Core_Model_Observer</class>-->
+<!--                        <method>paymentMethodIsActive</method>-->
+<!--                    </observer>-->
+<!--                </observers>-->
+<!--            </payment_method_is_active>-->
+        </events>
+
+    </global>
+
+    <adminhtml>
+        <translate>
+            <modules>
+                <integrai_core>
+                    <files>
+                        <default>Integrai_Core.csv</default>
+                    </files>
+                </integrai_core>
+            </modules>
+        </translate>
+    </adminhtml>
+
+    <default>
+        <integrai_core>
+            <general>
+                <enable>1</enable>
+            </general>
+        </integrai_core>
+    </default>
+</config>

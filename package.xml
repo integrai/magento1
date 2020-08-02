@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package>
+    <name>Integrai</name>
+    <version>1.0.0</version>
+    <stability>stable</stability>
+    <license>OSL v3.0</license>
+    <channel>community</channel>
+    <extends/>
+    <summary>IntegrAi - Integrações para seu ecommerce</summary>
+    <description>IntegrAi - Integrações para seu ecommerce</description>
+    <authors><author><name>Developers Integrai</name><user>developers_integrai</user><email>modulos@integrai.com.br</email></author></authors>
+    <date>2020-08-01</date>
+    <time>13:30:17</time>
+    <contents></contents>
+    <compatible/>
+    <dependencies><required><php><min>5.2.0</min><max>6.5.0</max></php></required></dependencies>
+</package>
