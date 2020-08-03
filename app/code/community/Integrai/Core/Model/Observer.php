@@ -7,12 +7,13 @@ class Integrai_Core_Model_Observer
      * */
 
     const NEW_CUSTOMER = 'NEW_CUSTOMER';
+    const CUSTOMER_BIRTHDAY = 'CUSTOMER_BIRTHDAY';
     const NEWSLETTER_SUBSCRIBER = 'NEWSLETTER_SUBSCRIBER';
     const ADD_PRODUCT_CART = 'ADD_PRODUCT_CART';
+    const ABANDONED_CART = 'ABANDONED_CART';
     const NEW_ORDER = 'NEW_ORDER';
     const SAVE_ORDER = 'SAVE_ORDER';
     const CANCEL_ORDER = 'CANCEL_ORDER';
-    const REFUND_INVOICE = 'REFUND_INVOICE';
     const FINALIZE_CHECKOUT = 'FINALIZE_CHECKOUT';
 
     protected function _getHelper()
@@ -38,8 +39,10 @@ class Integrai_Core_Model_Observer
     {
         if ($this->_getHelper()->isEventEnabled(self::NEWSLETTER_SUBSCRIBER)) {
             /* @var Mage_Newsletter_Model_Subscriber $newsletter */
-            $newsletter = $observer->getEvent()->getSubscriber();
-            return $this->_getApi()->sendEvent(self::NEWSLETTER_SUBSCRIBER, $newsletter->getData());
+            $subscriber = $observer->getEvent()->getSubscriber();
+            if ($subscriber->getIsStatusChanged()) {
+                return $this->_getApi()->sendEvent(self::NEWSLETTER_SUBSCRIBER, $subscriber->getData());
+            }
         }
     }
 
@@ -93,14 +96,6 @@ class Integrai_Core_Model_Observer
         }
     }
 
-    public function creditMemoRefundAfterSave(Varien_Event_Observer $observer)
-    {
-        if ($this->_getHelper()->isEventEnabled(self::REFUND_INVOICE)) {
-            $this->_getHelper()->log('creditMemoRefundAfterSave', $observer->getEvent()->getResut());
-            return $this->_getApi()->sendEvent(self::REFUND_INVOICE, $observer->getEvent()->getResut());
-        }
-    }
-
     public function checkoutSubmitAllAfter(Varien_Event_Observer $observer)
     {
         if ($this->_getHelper()->isEventEnabled(self::FINALIZE_CHECKOUT)) {
@@ -110,10 +105,48 @@ class Integrai_Core_Model_Observer
         }
     }
 
-//    public function paymentMethodIsActive(Varien_Event_Observer $observer)
-//    {
-//        if ($this->_getHelper()->isEventEnabled(self::FINALIZE_CHECKOUT)) {
-//            $this->_getHelper()->log('paymentMethodIsActive', $observer->getEvent()->getName());
-//        }
-//    }
+    public function abandonedCart() {
+        if ($this->_getHelper()->isEventEnabled(self::ABANDONED_CART)) {
+            $minutes = $this->_getHelper()->getGlobalConfig('minutes_abandoned_cart_lifetime', 60);
+            $fromDate = date('Y-m-d H:i:s', strtotime('-'.$minutes. ' minutes'));
+            $toDate = date('Y-m-d H:i:s', strtotime("now"));
+
+            /* @var Mage_Sales_Model_Quote $quotes */
+            $quotes = Mage::getModel('sales/quote')
+                ->getCollection()
+                ->addFieldToFilter('is_active', 1)
+                ->addFieldToFilter('items_count', array('gt' => 0))
+                ->addFieldToFilter('customer_email', array('notnull' => true))
+                ->addFieldToFilter('created_at', array('from'=>$fromDate, 'to'=>$toDate))
+                ->load();
+
+            $abandonedCart = array();
+            foreach ($quotes as $quote) {
+                $data = new Varien_Object();
+                $data->setQuote($quote->getData());
+                $items = array_map(function($item) {
+                    $newItem = new Varien_Object();
+                    $newItem->addData($item->getData());
+                    $newItem->setProduct($item->getProduct()->getData());
+                    return $newItem->getData();
+                }, $quote->getAllItems());
+                $data->setItems($items);
+                $data->setCustomer($quote->getCustomer()->getData());
+                array_push($abandonedCart, $data->getData());
+            }
+
+            return $this->_getApi()->sendEvent(self::ABANDONED_CART, $abandonedCart);
+        }
+    }
+
+    public function customerBirthday() {
+        if ($this->_getHelper()->isEventEnabled(self::CUSTOMER_BIRTHDAY)) {
+            $customers = Mage::getModel("customer/customer")
+                ->getCollection()
+                ->addNameToSelect()
+                ->addFieldToFilter('dob', array('like' => '%'.date("m").'-'.date("d").' 00:00:00'));
+
+            return $this->_getApi()->sendEvent(self::CUSTOMER_BIRTHDAY, $customers->getData());
+        }
+    }
 }

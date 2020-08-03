@@ -99,16 +99,6 @@
                 </observers>
             </order_cancel_after>
 
-            <!-- reembolso de invoice -->
-            <sales_order_creditmemo_save_after>
-                <observers>
-                    <observer>
-                        <class>Integrai_Core_Model_Observer</class>
-                        <method>creditMemoRefundAfterSave</method>
-                    </observer>
-                </observers>
-            </sales_order_creditmemo_save_after>
-
             <!-- finaliza checkout -->
             <checkout_submit_all_after>
                 <observers>
@@ -118,15 +108,6 @@
                     </observer>
                 </observers>
             </checkout_submit_all_after>
-
-<!--            <payment_method_is_active>-->
-<!--                <observers>-->
-<!--                    <observer>-->
-<!--                        <class>Integrai_Core_Model_Observer</class>-->
-<!--                        <method>paymentMethodIsActive</method>-->
-<!--                    </observer>-->
-<!--                </observers>-->
-<!--            </payment_method_is_active>-->
         </events>
 
     </global>
@@ -150,4 +131,26 @@
             </general>
         </integrai_core>
     </default>
+
+    <crontab>
+        <jobs>
+            <integrai_abandoned_cart>
+                <schedule>
+                    <cron_expr>0 */5 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>integrai/observer::abandonedCart</model>
+                </run>
+            </integrai_abandoned_cart>
+
+            <integrai_customer_birthday>
+                <schedule>
+                    <cron_expr>0 1 * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>integrai/observer::customerBirthday</model>
+                </run>
+            </integrai_customer_birthday>
+        </jobs>
+    </crontab>
 </config>
