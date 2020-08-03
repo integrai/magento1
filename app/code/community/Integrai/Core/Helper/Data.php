@@ -10,15 +10,24 @@ class Integrai_Core_Helper_Data  {
         Mage::log($message, null, $file, true);
     }
 
+    public function getConfig($name, $group = 'general') {
+        return Mage::getStoreConfigFlag('integrai_core/{$group}/{$name}');
+    }
+
     public function isEnabled() {
-        return Mage::getStoreConfigFlag('integrai_core/general/enable');
+        return $this->getConfig('enable');
     }
 
     public function isEventEnabled($eventName) {
-        $config = Mage::getModel('integrai/config')
-            ->load('EVENTS_ENABLED', 'name');
+        $config = Mage::getModel('integrai/config')->load('EVENTS_ENABLED', 'name');
         $events = json_decode($config->getData('values'), true);
         return $this->isEnabled() && in_array($eventName, $events);
+    }
+
+    public function getGlobalConfig($configName, $defaultValue = null) {
+        $configs = Mage::getModel('integrai/config')->load('GLOBAL', 'name');
+        $config = json_decode($configs->getData('values'), true);
+        return $config[$configName] ? $config[$configName] : $defaultValue;
     }
 
     public function isLoggedIn() {
