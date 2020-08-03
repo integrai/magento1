@@ -5,14 +5,23 @@ $configs = array(
         'name' => 'EVENTS_ENABLED',
         'values' => '[
           "NEW_CUSTOMER",
+          "CUSTOMER_BIRTHDAY",
           "NEWSLETTER_SUBSCRIBER",
           "ADD_PRODUCT_CART",
+          "ABANDONED_CART",
           "NEW_ORDER",
           "SAVE_ORDER",
           "CANCEL_ORDER",
-          "REFUND_INVOICE",
           "FINALIZE_CHECKOUT"
         ]',
+        'created_at' => strftime('%Y-%m-%d %H:%M:%S', time()),
+        'updated_at' => strftime('%Y-%m-%d %H:%M:%S', time()),
+    ),
+    array(
+        'name' => 'GLOBAL',
+        'values' => '{
+          "minutes_abandoned_cart_lifetime": 60
+        }',
         'created_at' => strftime('%Y-%m-%d %H:%M:%S', time()),
         'updated_at' => strftime('%Y-%m-%d %H:%M:%S', time()),
     ),
