@@ -1,17 +1,17 @@
 <?php
 
 class Integrai_Core_Helper_Data  {
-    public function log($message, $array = null, $file = "integrai.log")
+    public function log($message, $array = null, $level = Zend_Log::DEBUG, $file = "integrai.log")
     {
         if (!is_null($array)) {
             $message .= " - " . json_encode($array);
         }
 
-        Mage::log($message, null, $file, true);
+        Mage::log($message, $level, $file, true);
     }
 
     public function getConfig($name, $group = 'general') {
-        return Mage::getStoreConfigFlag('integrai_core/{$group}/{$name}');
+        return Mage::getStoreConfig("integrai_core/{$group}/{$name}");
     }
 
     public function isEnabled() {

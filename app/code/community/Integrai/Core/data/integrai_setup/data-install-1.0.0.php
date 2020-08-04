@@ -20,7 +20,9 @@ $configs = array(
     array(
         'name' => 'GLOBAL',
         'values' => '{
-          "minutes_abandoned_cart_lifetime": 60
+          "minutes_abandoned_cart_lifetime": 60,
+          "api_url": "https://api.integrai.com.br/v1",
+          "api_timeout_seconds": 3
         }',
         'created_at' => strftime('%Y-%m-%d %H:%M:%S', time()),
         'updated_at' => strftime('%Y-%m-%d %H:%M:%S', time()),

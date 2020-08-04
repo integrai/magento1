@@ -19,6 +19,9 @@
                     <config>
                         <table>integrai_config</table>
                     </config>
+                    <events>
+                        <table>integrai_events</table>
+                    </events>
                 </entities>
             </integrai_resource>
         </models>
@@ -151,6 +154,15 @@
                     <model>integrai/observer::customerBirthday</model>
                 </run>
             </integrai_customer_birthday>
+
+            <integrai_resend_backup_event>
+                <schedule>
+                    <cron_expr>0 */5 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>integrai/api::resendBackupEvents</model>
+                </run>
+            </integrai_resend_backup_event>
         </jobs>
     </crontab>
 </config>
