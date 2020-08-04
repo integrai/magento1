@@ -7,6 +7,18 @@
         </Integrai_Core>
     </modules>
 
+    <frontend>
+        <routers>
+            <integrai>
+                <use>standard</use>
+                <args>
+                    <module>Integrai_Core</module>
+                    <frontName>integrai</frontName>
+                </args>
+            </integrai>
+        </routers>
+    </frontend>
+
     <global>
         <models>
             <integrai>
