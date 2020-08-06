@@ -14,20 +14,32 @@ class Integrai_Core_Helper_Data  {
         return Mage::getStoreConfig("integrai_core/{$group}/{$name}");
     }
 
+    public function getCarrierConfig($name) {
+        return Mage::getStoreConfig("carriers/integrai_shipping/{$name}");
+    }
+
+    public function getConfigTable($name, $configName = null, $defaultValue = null) {
+        $config = Mage::getModel('integrai/config')->load($name, 'name');
+        $values = json_decode($config->getData('values'), true);
+
+        if ($configName) {
+            return $values[$configName] ?: $defaultValue;
+        }
+
+        return $values;
+    }
+
     public function isEnabled() {
         return $this->getConfig('enable');
     }
 
     public function isEventEnabled($eventName) {
-        $config = Mage::getModel('integrai/config')->load('EVENTS_ENABLED', 'name');
-        $events = json_decode($config->getData('values'), true);
+        $events =  $this->getConfigTable('EVENTS_ENABLED');
         return $this->isEnabled() && in_array($eventName, $events);
     }
 
     public function getGlobalConfig($configName, $defaultValue = null) {
-        $configs = Mage::getModel('integrai/config')->load('GLOBAL', 'name');
-        $config = json_decode($configs->getData('values'), true);
-        return $config[$configName] ? $config[$configName] : $defaultValue;
+        return $this->getConfigTable('GLOBAL', $configName, $defaultValue);
     }
 
     public function isLoggedIn() {

@@ -21,23 +21,21 @@ class Integrai_Core_Model_Api {
             $curl_options[CURLOPT_POSTFIELDS] = json_encode($body);
         }
 
-        $this->_getHelper()->log('options', $curl_options);
-
         curl_setopt_array($curl, $curl_options);
 
-        $response = curl_exec($curl);
+        $response = json_decode(curl_exec($curl), true);
         $info = curl_getinfo($curl);
 
         if($info['http_code'] !== 200) {
             $this->_getHelper()->log("HTTP ERROR", array(
                 'code' => curl_errno($curl),
                 'error' => curl_error($curl),
+                'response' => $response,
                 'info' => $info,
             ), Zend_Log::ERR);
-            throw new Exception(curl_error($curl));
-        }
 
-        $this->_getHelper()->log('response', $response);
+            throw new Exception($response['error']);
+        }
 
         curl_close($curl);
         return $response;

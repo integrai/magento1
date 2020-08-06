@@ -27,6 +27,19 @@ $configs = array(
         'created_at' => strftime('%Y-%m-%d %H:%M:%S', time()),
         'updated_at' => strftime('%Y-%m-%d %H:%M:%S', time()),
     ),
+    array(
+        'name' => 'SHIPPING',
+        'values' => '{
+          "attribute_width": "width",
+          "attribute_height": "height",
+          "attribute_length": "length",
+          "width_default": 11,
+          "height_default": 2,
+          "length_default": 16
+        }',
+        'created_at' => strftime('%Y-%m-%d %H:%M:%S', time()),
+        'updated_at' => strftime('%Y-%m-%d %H:%M:%S', time()),
+    ),
 );
 
 foreach ($configs as $config) {

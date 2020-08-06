@@ -145,6 +145,15 @@
                 <enable>1</enable>
             </general>
         </integrai_core>
+
+        <carriers>
+            <integrai_shipping>
+                <active>1</active>
+                <model>integrai/carrier</model>
+                <title>Serviços de Entrega</title>
+                <sort_order>0</sort_order>
+            </integrai_shipping>
+        </carriers>
     </default>
 
     <crontab>

@@ -4,6 +4,9 @@
         <Integrai_Core>
             <active>true</active>
             <codePool>community</codePool>
+            <depends>
+                <Mage_Shipping />
+            </depends>
         </Integrai_Core>
     </modules>
 </config>

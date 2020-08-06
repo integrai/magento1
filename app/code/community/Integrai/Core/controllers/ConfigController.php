@@ -49,4 +49,27 @@ class Integrai_Core_ConfigController
 //            $this->_redirect("/");
 //        }
     }
+
+    public function attributesAction() {
+        $attributes = Mage::getSingleton('eav/config')
+            ->getEntityType(Mage_Catalog_Model_Product::ENTITY)
+            ->getAttributeCollection()
+            ->setOrder('frontend_label','ASC');
+
+        $options = array();
+
+        /** @var  Mage_Eav_Model_Config $attribute */
+        foreach ($attributes as $attribute) {
+            $label = $attribute->getStoreLabel() ?: $attribute->getFrontendLabel();
+            if ($label) {
+                $options[] = array(
+                    "label" => $label,
+                    "value" => $attribute->getAttributeCode(),
+                );
+            }
+        }
+
+        $this->getResponse()->setHeader('Content-type', 'application/json');
+        $this->getResponse()->setBody(Mage::helper('core')->jsonEncode($options));
+    }
 }
