@@ -18,14 +18,14 @@ class Integrai_Core_Model_Carrier
 
     public function collectRates(Mage_Shipping_Model_Rate_Request $request)
     {
-        /** @var Mage_Shipping_Model_Rate_Result $result */
         try{
-            $params = $this->_prepareParamsRequest($request);
+            $params = $this->prepareParamsRequest($request);
             $services = $this->_getApi()->request('/shipping/quote', 'POST', $params);
 
+            /** @var Mage_Shipping_Model_Rate_Result $result */
             $result = Mage::getModel('shipping/rate_result');
             foreach ($services as $service) {
-                $result->append($this->_transformRate($service));
+                $result->append($this->transformRate($service));
             }
             return $result;
         } catch (Exception $e) {
@@ -40,7 +40,7 @@ class Integrai_Core_Model_Carrier
         }
     }
 
-    private function _prepareParamsRequest(Mage_Shipping_Model_Rate_Request $request) {
+    private function prepareParamsRequest(Mage_Shipping_Model_Rate_Request $request) {
         return array(
             "destination_zipcode" => $request->getDestPostcode(),
             "cart_total_price" => $request->getPackageValue(),
@@ -49,11 +49,11 @@ class Integrai_Core_Model_Carrier
             "cart_total_height" => $request->getPackageHeight(),
             "cart_total_width" => $request->getPackageWidth(),
             "cart_total_length" => $request->getPackageDepth(),
-            "items" => $this->_prepareItems($request->getAllItems()),
+            "items" => $this->prepareItems($request->getAllItems()),
         );
     }
 
-    private function _prepareItems(array $items)  {
+    private function prepareItems(array $items)  {
         $packageItems = array();
 
         foreach ($items as $item) {
@@ -120,14 +120,7 @@ class Integrai_Core_Model_Carrier
         return $value ?: null;
     }
 
-    public function getAllowedMethods()
-    {
-        return array(
-            self::$_code => $this->_getHelper()->getCarrierConfig('title'),
-        );
-    }
-
-    protected function _transformRate($service)
+    protected function transformRate($service)
     {
         /** @var Mage_Shipping_Model_Rate_Result_Method $rate */
         $rate = Mage::getModel('shipping/rate_result_method');
@@ -143,26 +136,13 @@ class Integrai_Core_Model_Carrier
         return $rate;
     }
 
-    protected function checkErros() {
-
-        if (!empty($this->errors)) {
-            /** @var Mage_Shipping_Model_Rate_Result_Error $error */
-            $error = Mage::getModel('shipping/rate_result_error');
-            $data  = [
-                'carrier'       => $this->_code,
-                'carrier_title' => $this->config->getCarrierConfig('title'),
-                'error_message' => implode(', ', $this->errors)
-            ];
-            $error->setData($data);
-            $this->debug($data);
-
-            return $error;
-        }
+    public function getAllowedMethods()
+    {
+        return array(
+            self::$_code => $this->_getHelper()->getCarrierConfig('title'),
+        );
     }
 
-    /**
-     * @return bool
-     */
     public function isTrackingAvailable()
     {
         return true;
