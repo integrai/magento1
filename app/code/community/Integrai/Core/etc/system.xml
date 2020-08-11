@@ -34,14 +34,14 @@
                         </enable>
                         <api_key translate="label">
                             <label>API Key: </label>
-                            <comment>Sua API Key criadas no dashboard da IntegrAi</comment>
+                            <comment>Sua API Key criada no dashboard da IntegrAi</comment>
                             <frontend_type>text</frontend_type>
                             <sort_order>2</sort_order>
                             <show_in_default>1</show_in_default>
                         </api_key>
                         <secret_key translate="label">
                             <label>Secret Key: </label>
-                            <comment>Sua Secret Key criadas no dashboard da IntegrAi</comment>
+                            <comment>Sua Secret Key criada no dashboard da IntegrAi</comment>
                             <frontend_type>password</frontend_type>
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>

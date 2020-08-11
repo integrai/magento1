@@ -18,25 +18,27 @@ class Integrai_Core_Model_Carrier
 
     public function collectRates(Mage_Shipping_Model_Rate_Request $request)
     {
-        try{
-            $params = $this->prepareParamsRequest($request);
-            $services = $this->_getApi()->request('/shipping/quote', 'POST', $params);
+        if ($this->_getHelper()->getCarrierConfig('active') && $this->_getHelper()->isEnabled()) {
+            try{
+                $params = $this->prepareParamsRequest($request);
+                $services = $this->_getApi()->request('/shipping/quote', 'POST', $params);
 
-            /** @var Mage_Shipping_Model_Rate_Result $result */
-            $result = Mage::getModel('shipping/rate_result');
-            foreach ($services as $service) {
-                $result->append($this->transformRate($service));
+                /** @var Mage_Shipping_Model_Rate_Result $result */
+                $result = Mage::getModel('shipping/rate_result');
+                foreach ($services as $service) {
+                    $result->append($this->transformRate($service));
+                }
+                return $result;
+            } catch (Exception $e) {
+                $error = Mage::getModel('shipping/rate_result_error');
+                $data  = [
+                    'carrier'       => $this->_code,
+                    'carrier_title' => $this->_getHelper()->getCarrierConfig('title'),
+                    'error_message' => $e->getMessage(),
+                ];
+                $error->setData($data);
+                return $error;
             }
-            return $result;
-        } catch (Exception $e) {
-            $error = Mage::getModel('shipping/rate_result_error');
-            $data  = [
-                'carrier'       => $this->_code,
-                'carrier_title' => $this->_getHelper()->getCarrierConfig('title'),
-                'error_message' => $e->getMessage(),
-            ];
-            $error->setData($data);
-            return $error;
         }
     }
 
