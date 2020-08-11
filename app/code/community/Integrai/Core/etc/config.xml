@@ -113,16 +113,6 @@
                     </observer>
                 </observers>
             </order_cancel_after>
-
-            <!-- finaliza checkout -->
-            <checkout_submit_all_after>
-                <observers>
-                    <observer>
-                        <class>Integrai_Core_Model_Observer</class>
-                        <method>checkoutSubmitAllAfter</method>
-                    </observer>
-                </observers>
-            </checkout_submit_all_after>
         </events>
 
     </global>

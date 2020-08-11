@@ -6,7 +6,7 @@ class Integrai_Core_Model_Observer
      * Tipos de Evento
      * */
 
-    const NEW_CUSTOMER = 'NEW_CUSTOMER';
+    const SAVE_CUSTOMER = 'SAVE_CUSTOMER';
     const CUSTOMER_BIRTHDAY = 'CUSTOMER_BIRTHDAY';
     const NEWSLETTER_SUBSCRIBER = 'NEWSLETTER_SUBSCRIBER';
     const ADD_PRODUCT_CART = 'ADD_PRODUCT_CART';
@@ -14,7 +14,6 @@ class Integrai_Core_Model_Observer
     const NEW_ORDER = 'NEW_ORDER';
     const SAVE_ORDER = 'SAVE_ORDER';
     const CANCEL_ORDER = 'CANCEL_ORDER';
-    const FINALIZE_CHECKOUT = 'FINALIZE_CHECKOUT';
 
     protected function _getHelper()
     {
@@ -28,10 +27,10 @@ class Integrai_Core_Model_Observer
 
     public function customerRegisterSuccess(Varien_Event_Observer $observer)
     {
-        if ($this->_getHelper()->isEventEnabled(self::NEW_CUSTOMER)) {
+        if ($this->_getHelper()->isEventEnabled(self::SAVE_CUSTOMER)) {
             /* @var Mage_Customer_Model_Customer $customer */
             $customer = $observer->getCustomer();
-            return $this->_getApi()->sendEvent(self::NEW_CUSTOMER, $customer->getData());
+            return $this->_getApi()->sendEvent(self::SAVE_CUSTOMER, $customer->getData());
         }
     }
 
@@ -93,15 +92,6 @@ class Integrai_Core_Model_Observer
             /* @var Mage_Sales_Model_Order $order */
             $order = $observer->getOrder();
             return $this->_getApi()->sendEvent(self::CANCEL_ORDER, $order->getData());
-        }
-    }
-
-    public function checkoutSubmitAllAfter(Varien_Event_Observer $observer)
-    {
-        if ($this->_getHelper()->isEventEnabled(self::FINALIZE_CHECKOUT)) {
-            /* @var Mage_Sales_Model_Order $order */
-            $order = $observer->getOrder();
-            return $this->_getApi()->sendEvent(self::FINALIZE_CHECKOUT, $order->getData());
         }
     }
 
