@@ -3,7 +3,7 @@
 <config>
     <tabs>
         <integrai translate="label" module="core">
-            <label>IntegrAi</label>
+            <label>integrai</label>
             <sort_order>0</sort_order>
         </integrai>
     </tabs>

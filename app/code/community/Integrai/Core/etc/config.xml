@@ -118,6 +118,29 @@
     </global>
 
     <adminhtml>
+        <acl>
+            <resources>
+                <all>
+                    <title>Allow Everything</title>
+                </all>
+                <admin>
+                    <children>
+                        <system>
+                            <children>
+                                <config>
+                                    <children>
+                                        <integrai_core>
+                                            <title>Integrai - All</title>
+                                        </integrai_core>
+                                    </children>
+                                </config>
+                            </children>
+                        </system>
+                    </children>
+                </admin>
+            </resources>
+        </acl>
+
         <translate>
             <modules>
                 <integrai_core>

@@ -16,7 +16,7 @@ class Integrai_Core_ConfigController
         try{
             $this->_getHelper()->log('Buscando novas configurações...');
             $api = Mage::getModel('integrai/api');
-            $configs = $api->request('/config');
+            $configs = $api->request('/store/event/configs');
 
             foreach ($configs as $config) {
                 $configItem = Mage::getModel('integrai/config')
@@ -41,7 +41,10 @@ class Integrai_Core_ConfigController
             )));
         } catch (Exception $e) {
             $this->_getHelper()->log('Error ao atualizar configs', $e->getMessage());
-            $this->_redirect("/");
+            $this->getResponse()->setHttpResponseCode(400)->setBody(Mage::helper('core')->jsonEncode(array(
+                "ok" => false,
+                "error" => $e->getMessage()
+            )));
         }
 
 //        } else {

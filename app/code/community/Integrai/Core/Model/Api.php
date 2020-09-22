@@ -34,7 +34,7 @@ class Integrai_Core_Model_Api {
                 'info' => $info,
             ), Zend_Log::ERR);
 
-            throw new Exception($response['error']);
+            throw new Exception(curl_error($curl));
         }
 
         curl_close($curl);
@@ -55,7 +55,7 @@ class Integrai_Core_Model_Api {
         return array(
             "Content-Type: application/json",
             "Accept: application/json",
-            "Authorization: Bearer {$token}",
+            "Authorization: Basic {$token}",
             "x-integrai-plaform: magento",
             "x-integrai-plaform-version: {$magentoVersion}",
             "x-integrai-module-version: {$moduleVersion}",
