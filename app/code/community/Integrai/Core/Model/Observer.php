@@ -37,10 +37,19 @@ class Integrai_Core_Model_Observer
     public function newsletterSubscriberSaveAfter(Varien_Event_Observer $observer)
     {
         if ($this->_getHelper()->isEventEnabled(self::NEWSLETTER_SUBSCRIBER)) {
-            /* @var Mage_Newsletter_Model_Subscriber $newsletter */
+            /* @var Mage_Newsletter_Model_Subscriber $subscriber */
             $subscriber = $observer->getEvent()->getSubscriber();
             if ($subscriber->getIsStatusChanged()) {
-                return $this->_getApi()->sendEvent(self::NEWSLETTER_SUBSCRIBER, $subscriber->getData());
+                $newsletter = new Varien_Object();
+                $newsletter->setData($subscriber->getData());
+
+                $customer_id = $subscriber->getCustomerId();
+                if ($customer_id) {
+                    /* @var Mage_Customer_Model_Customer $customer */
+                    $customer = Mage::getModel('customer/customer')->load($customer_id);
+                    $newsletter->setData('subscriber_name', $customer->getName());
+                }
+                return $this->_getApi()->sendEvent(self::NEWSLETTER_SUBSCRIBER, $newsletter->getData());
             }
         }
     }
@@ -50,9 +59,18 @@ class Integrai_Core_Model_Observer
         if ($this->_getHelper()->isEventEnabled(self::ADD_PRODUCT_CART) && $this->_getHelper()->isLoggedIn()) {
             $customer = Mage::getSingleton('customer/session')->getCustomer();
 
+            $quoteItem = $observer->getQuoteItem();
+
             $data = new Varien_Object();
             $data->setCustomer($customer->getData());
-            $data->setItem($observer->getQuoteItem()->getData());
+
+            $item = new Varien_Object();
+            $item->setData($quoteItem->getData());
+
+            $product = Mage::getModel('catalog/product')
+                ->loadByAttribute('sku', $quoteItem->getData('sku'));
+            $item->setPrice(floatval($product->getPrice()));
+            $data->setItem($item->getData());
 
             return $this->_getApi()->sendEvent(self::ADD_PRODUCT_CART, $data->getData());
         }
