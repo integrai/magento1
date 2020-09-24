@@ -4,6 +4,8 @@ class Integrai_Core_Model_Carrier
     extends Mage_Shipping_Model_Carrier_Abstract
     implements Mage_Shipping_Model_Carrier_Interface {
 
+    const QUOTE = 'QUOTE';
+
     protected $_code = 'integrai_shipping';
 
     protected function _getHelper()
@@ -18,7 +20,7 @@ class Integrai_Core_Model_Carrier
 
     public function collectRates(Mage_Shipping_Model_Rate_Request $request)
     {
-        if ($this->_getHelper()->getCarrierConfig('active') && $this->_getHelper()->isEnabled()) {
+        if ($this->_getHelper()->isEventEnabled(self::QUOTE)) {
             try{
                 $params = $this->prepareParamsRequest($request);
                 $services = $this->_getApi()->request('/shipping/quote', 'POST', $params);
