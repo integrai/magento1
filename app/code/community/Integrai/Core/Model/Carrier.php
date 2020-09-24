@@ -23,8 +23,7 @@ class Integrai_Core_Model_Carrier
         if ($this->_getHelper()->isEventEnabled(self::QUOTE)) {
             try{
                 $params = $this->prepareParamsRequest($request);
-                $services = $this->_getApi()->request('/shipping/quote', 'POST', $params);
-
+                $services = $this->_getApi()->request('/quote/shipping', 'POST', $params);
                 /** @var Mage_Shipping_Model_Rate_Result $result */
                 $result = Mage::getModel('shipping/rate_result');
                 foreach ($services as $service) {
@@ -129,10 +128,16 @@ class Integrai_Core_Model_Carrier
         /** @var Mage_Shipping_Model_Rate_Result_Method $rate */
         $rate = Mage::getModel('shipping/rate_result_method');
 
+        $deliveryText = str_replace('%s', $service['deliveryTime'], $service['deliveryText']);
+        $methodTitle = '$methodTitle - $deliveryText';
+
         $rate->setCarrier($this->_code);
         $rate->setCarrierTitle($service['carrierTitle']);
         $rate->setMethod($service['methodCode']);
-        $rate->setMethodTitle($service['methodTitle']);
+        $rate->setMethodTitle(strtr($methodTitle, array(
+            '$methodTitle' => $service['methodTitle'],
+            '$deliveryText' => $deliveryText
+        )));
         $rate->setMethodDescription($service['methodDescription']);
         $rate->setPrice($service['price']);
         $rate->setCost($service['cost']);
