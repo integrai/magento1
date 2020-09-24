@@ -64,7 +64,7 @@ class Integrai_Core_Model_Api {
 
     public function sendEvent($eventName, $payload, $resend = false) {
         try{
-            $response = $this->request('/event/magento', 'POST', array(
+            $response = $this->request('/store/event/magento', 'POST', array(
                 'event' => $eventName,
                 'payload' => $payload,
             ));
