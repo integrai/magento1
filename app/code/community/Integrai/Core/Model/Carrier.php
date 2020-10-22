@@ -130,6 +130,7 @@ class Integrai_Core_Model_Carrier
 
         $deliveryText = str_replace('%s', $service['deliveryTime'], $service['deliveryText']);
         $methodTitle = '$methodTitle - $deliveryText';
+        $methodDescription = !empty($service['methodDescription']) ? $service['methodDescription'] : null;
 
         $rate->setCarrier($this->_code);
         $rate->setCarrierTitle($service['carrierTitle']);
@@ -138,7 +139,7 @@ class Integrai_Core_Model_Carrier
             '$methodTitle' => $service['methodTitle'],
             '$deliveryText' => $deliveryText
         )));
-        $rate->setMethodDescription($service['methodDescription']);
+        $rate->setMethodDescription($methodDescription);
         $rate->setPrice($service['price']);
         $rate->setCost($service['cost']);
 
