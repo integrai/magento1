@@ -16,7 +16,7 @@ class Integrai_Core_ConfigController
         try{
             $this->_getHelper()->log('Buscando novas configurações...');
             $api = Mage::getModel('integrai/api');
-            $configs = $api->request('/store/event/configs');
+            $configs = $api->request('/store/config');
 
             foreach ($configs as $config) {
                 $configItem = Mage::getModel('integrai/config')
