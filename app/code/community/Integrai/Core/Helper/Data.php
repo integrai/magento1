@@ -1,6 +1,6 @@
 <?php
 
-class Integrai_Core_Helper_Data  {
+class Integrai_Core_Helper_Data extends Mage_Core_Helper_Abstract  {
     public function log($message, $array = null, $level = Zend_Log::DEBUG, $file = "integrai.log")
     {
         if (!is_null($array)) {
@@ -18,9 +18,14 @@ class Integrai_Core_Helper_Data  {
         return Mage::getStoreConfig("carriers/integrai_shipping/{$name}");
     }
 
-    public function getConfigTable($name, $configName = null, $defaultValue = null) {
+    public function getConfigTable($name, $configName = null, $defaultValue = null, $parseJson = true) {
         $config = Mage::getModel('integrai/config')->load($name, 'name');
-        $values = json_decode($config->getData('values'), true);
+
+        if ($parseJson) {
+            $values = json_decode($config->getData('values'), true);
+        } else {
+            $values = $config->getData('values');
+        }
 
         if ($configName) {
             return $values[$configName] ?: $defaultValue;

@@ -53,6 +53,12 @@
             </integrai_setup>
         </resources>
 
+        <blocks>
+            <integrai>
+                <class>Integrai_Core_Block</class>
+            </integrai>
+        </blocks>
+
         <events>
             <!-- criação de conta de usuário -->
             <customer_register_success>
@@ -167,6 +173,23 @@
                 <sort_order>0</sort_order>
             </integrai_shipping>
         </carriers>
+
+        <payment>
+            <integrai_boleto>
+                <active>1</active>
+                <model>Integrai_Core_Model_Payment_Boleto</model>
+                <title>Boleto</title>
+                <payment_action>sale</payment_action>
+                <sort_order>0</sort_order>
+            </integrai_boleto>
+            <integrai_creditcard>
+                <active>1</active>
+                <model>Integrai_Core_Model_Payment_CreditCard</model>
+                <title>Cartão de Crédito</title>
+                <payment_action>sale</payment_action>
+                <sort_order>1</sort_order>
+            </integrai_creditcard>
+        </payment>
     </default>
 
     <crontab>
