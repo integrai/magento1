@@ -2,11 +2,7 @@
 
 class Integrai_Core_Model_Payment_CreditCard extends Mage_Payment_Model_Method_Abstract
 {
-//    protected $_code = 'integrai_creditcard';
-//    protected $_isInitializeNeeded      = true;
-//    protected $_canUseInternal          = false;
-//    protected $_canUseForMultishipping  = false;
-    protected $_code = 'integrai_creditcard';
+    protected $_code                    = 'integrai_creditcard';
     protected $_isInitializeNeeded      = true;
     protected $_canUseInternal          = false;
     protected $_canUseForMultishipping  = false;
