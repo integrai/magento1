@@ -17,6 +17,13 @@
                 </args>
             </integrai>
         </routers>
+        <layout>
+            <updates>
+                <integrai_core module="Integrai_Core">
+                    <file>integrai_core.xml</file>
+                </integrai_core>
+            </updates>
+        </layout>
     </frontend>
 
     <global>
@@ -57,6 +64,11 @@
             <integrai>
                 <class>Integrai_Core_Block</class>
             </integrai>
+            <page>
+                <rewrite>
+                    <html_head>Integrai_Core_Block_Html_Head</html_head>
+                </rewrite>
+            </page>
         </blocks>
 
         <events>
