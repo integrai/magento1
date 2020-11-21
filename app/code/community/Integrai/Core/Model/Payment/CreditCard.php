@@ -25,8 +25,12 @@ class Integrai_Core_Model_Payment_CreditCard extends Mage_Payment_Model_Method_A
         return true;
     }
 
-    public function getForm()
+    public function getScripts()
     {
-        return $this->_getHelper()->getConfigTable('PAYMENT_CREDITCARD', null, null, false);
+        $configName = 'PAYMENT_CREDITCARD';
+        $form = $this->_getHelper()->getConfigTable($configName, "form");
+        $gateways = $this->_getHelper()->getConfigTable($configName, "gateways");
+
+        return array_merge($gateways, array($form));
     }
 }
