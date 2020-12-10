@@ -44,6 +44,12 @@ class Integrai_Core_Model_Carrier
     }
 
     private function prepareParamsRequest(Mage_Shipping_Model_Rate_Request $request) {
+        $zipCode = preg_replace('/[^0-9]/', '', $request->getDestPostcode());
+
+        if (strlen($zipCode) !== 8) {
+            throw new Exception("CEP Inválido");
+        }
+
         return array(
             "destination_zipcode" => $request->getDestPostcode(),
             "cart_total_price" => $request->getPackageValue(),
