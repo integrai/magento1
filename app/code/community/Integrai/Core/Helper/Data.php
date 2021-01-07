@@ -4,7 +4,7 @@ class Integrai_Core_Helper_Data extends Mage_Core_Helper_Abstract  {
     public function log($message, $array = null, $level = Zend_Log::DEBUG, $file = "integrai.log")
     {
         if (!is_null($array)) {
-            $message .= " - " . json_encode($array);
+            $message .= " - " . json_encode($array, JSON_PRETTY_PRINT);
         }
 
         Mage::log($message, $level, $file, true);

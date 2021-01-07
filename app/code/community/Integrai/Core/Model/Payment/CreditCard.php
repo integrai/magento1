@@ -25,12 +25,15 @@ class Integrai_Core_Model_Payment_CreditCard extends Mage_Payment_Model_Method_A
         return true;
     }
 
-    public function getScripts()
+    public function getPaymentCreditCardConfig()
     {
-        $configName = 'PAYMENT_CREDITCARD';
-        $form = $this->_getHelper()->getConfigTable($configName, "form");
-        $gateways = $this->_getHelper()->getConfigTable($configName, "gateways");
+        return json_encode($this->_getHelper()->getConfigTable('PAYMENT_CREDITCARD'));
+    }
 
-        return array_merge($gateways, array($form));
+    public function getAmount()
+    {
+        $checkout = Mage::getSingleton('checkout/session');
+        $quote = $checkout->getQuote();
+        return (float) $quote->getBaseGrandTotal();
     }
 }

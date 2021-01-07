@@ -2,11 +2,11 @@
     const {
         formOptions = {},
         scripts = [],
-    } = JSON.parse('<?php echo $this->getPaymentCreditCardConfig() ?>');
+    } = JSON.parse('<?php echo $this->getPaymentBoletoConfig() ?>');
 
-    window.IntegraiCreditCard = {
+    window.IntegraiBoleto = {
         ...formOptions,
-        amount: <?php echo $this->getAmount() ?>
+        boletoModel: JSON.parse('<?php echo $this->getCustomer() ?>'),
     };
 
     scripts.forEach(function (script) {
@@ -17,5 +17,5 @@
 </script>
 
 <div class="form-list" id="payment_form_<?php echo $this->getMethodCode() ?>" style="display:none;">
-    <div id="integrai-payment-creditcard"></div>
+    <div id="integrai-payment-boleto"></div>
 </div>

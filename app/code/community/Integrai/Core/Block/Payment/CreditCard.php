@@ -13,6 +13,7 @@ class Integrai_Core_Block_Payment_CreditCard extends Mage_Payment_Block_Form
     protected function _prepareLayout()
     {
         $paymentModel = Mage::getSingleton('Integrai_Core_Model_Payment_CreditCard');
-        $this->setScripts($paymentModel->getScripts());
+        $this->setPaymentCreditCardConfig($paymentModel->getPaymentCreditCardConfig());
+        $this->setAmount($paymentModel->getAmount());
     }
 }

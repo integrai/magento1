@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<layout version="0.1.0">
+    <default>
+        <reference name="head">
+            <action method="replaceItem">
+                <type>js</type>
+                <name>prototype/prototype.js</name>
+                <replace>integrai/js/prototype.js</replace>
+            </action>
+        </reference>
+    </default>
+</layout>
