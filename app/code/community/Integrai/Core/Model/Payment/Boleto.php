@@ -29,18 +29,29 @@ class Integrai_Core_Model_Payment_Boleto extends Mage_Payment_Model_Method_Abstr
         $checkout = Mage::getSingleton('checkout/session');
         $quote = $checkout->getQuote();
         $customer = $quote->getCustomer();
-        $billing = $customer->getDefaultBillingAddress();
 
-        $this->_getHelper()->log("CUSTOMER", array(
-            'customer' => $customer->getData(),
-            'billing' => $billing->getData(),
-        ));
+        if (!empty($customer->getId())) {
+            $billing = $customer->getDefaultBillingAddress();
+
+            return array(
+                "name" => $customer->getFirstname(),
+                "lastName" => $customer->getLastname(),
+                "companyName" => $customer->getFirstname(),
+                "docNumber" => $customer->getData('taxvat'),
+                "addressStreet" => $billing->getStreet1(),
+                "addressNumber" => $billing->getStreet2(),
+                "addressCity" => $billing->getCity(),
+                "addressState" => $billing->getRegionCode(),
+                "addressZipCode" => $billing->getPostcode(),
+            );
+        }
+
+        $billing = $quote->getBillingAddress();
 
         return array(
-            "name" => $customer->getFirstname(),
-            "lastName" => $customer->getLastname(),
-            "companyName" => $customer->getFirstname(),
-            "docNumber" => $customer->getData('taxvat'),
+            "name" => $quote->getCustomerFirstname(),
+            "lastName" => $quote->getCustomerLastname(),
+            "docNumber" => $quote->getCustomerTaxvat(),
             "addressStreet" => $billing->getStreet1(),
             "addressNumber" => $billing->getStreet2(),
             "addressCity" => $billing->getCity(),
