@@ -34,6 +34,6 @@ class Integrai_Core_Model_Payment_CreditCard extends Mage_Payment_Model_Method_A
     {
         $checkout = Mage::getSingleton('checkout/session');
         $quote = $checkout->getQuote();
-        return (float) $quote->getBaseGrandTotal() || 0;
+        return (float) $quote->getBaseGrandTotal();
     }
 }

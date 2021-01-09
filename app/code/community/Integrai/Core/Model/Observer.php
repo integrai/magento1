@@ -82,12 +82,36 @@ class Integrai_Core_Model_Observer
             /* @var Mage_Sales_Model_Order $order */
             $order = $observer->getOrder();
 
+            $customer = $order->getCustomer()->getData();
+            $document = preg_replace('/\D/', '', $customer['taxvat']);
+            $customer['document_type'] = strlen($document) > 11 ? 'cnpj' : 'cpf';
+
+            $billing = $order->getBillingAddress()->getData();
+            $billing['street_1'] = $order->getBillingAddress()->getStreet1();
+            $billing['street_2'] = $order->getBillingAddress()->getStreet2();
+            $billing['street_3'] = $order->getBillingAddress()->getStreet3();
+            $billing['street_4'] = $order->getBillingAddress()->getStreet4();
+            $billing['region_code'] = $order->getBillingAddress()->getRegionCode();
+
+            $shipping = $order->getShippingAddress()->getData();
+            $shipping['street_1'] = $order->getShippingAddress()->getStreet1();
+            $shipping['street_2'] = $order->getShippingAddress()->getStreet2();
+            $shipping['street_3'] = $order->getShippingAddress()->getStreet3();
+            $shipping['street_4'] = $order->getShippingAddress()->getStreet4();
+            $shipping['region_code'] = $order->getShippingAddress()->getRegionCode();
+
+            $items = array();
+            foreach ($order->getAllVisibleItems() as $item) {
+                $items[] = $item->getData();
+            }
+
             $data = new Varien_Object();
             $data->setOrder($order->getData());
-            $data->setCustomer($order->getCustomer()->getData());
-            $data->setBillingAddress($order->getBillingAddress()->getData());
-            $data->setShippingAddress($order->getShippingAddress()->getData());
+            $data->setCustomer($customer);
+            $data->setBillingAddress($billing);
+            $data->setShippingAddress($shipping);
             $data->setPayment($order->getPayment()->getData());
+            $data->setItems($items);
             $data->setShippingMethod($order->getShippingMethod());
             $data->setShippingMethodDetail($order->getShippingMethod(true));
 
