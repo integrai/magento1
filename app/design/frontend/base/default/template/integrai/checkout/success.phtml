@@ -1,0 +1,33 @@
+<?php
+    $lastOrder = Mage::getModel('sales/order')
+        ->loadByIncrementId(Mage::getSingleton('checkout/session')->getLastRealOrderId());
+
+    $order = json_encode(array(
+        "order_entity_id" => $lastOrder->getEntityId(),
+        "order_increment_id" => $lastOrder->getIncrementId(),
+        "order_link_detail" => Mage::getUrl('sales/order/view', array('order_id' => $lastOrder->getEntityId())),
+        "payment_method" => $lastOrder->getPayment()->getMethod()
+    ));
+
+    $pageSuccess = json_encode(Mage::helper('integrai')->getConfigTable('PAYMENT_SUCCESS'));
+?>
+
+<script>
+    const {
+        pageOptions = {},
+        scripts = [],
+    } = JSON.parse('<?php echo $pageSuccess ?>');
+
+    window.IntegraiSuccess = {
+        ...pageOptions,
+        order: JSON.parse('<?php echo $order ?>'),
+    };
+
+    scripts.forEach(function (script) {
+        let scriptElm = document.createElement('script');
+        scriptElm.src = script;
+        document.head.appendChild(scriptElm);
+    });
+</script>
+
+<div id="integrai-payment-success"></div>
