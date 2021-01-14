@@ -6,14 +6,21 @@ class Integrai_Core_Model_Api {
         return Mage::helper('integrai');
     }
 
-    public function request($endpoint, $method = 'GET', $body = array()) {
+    public function request($endpoint, $method = 'GET', $body = array(), $params = array()) {
         $curl = curl_init();
+
+        $url = $this->getApiUrl() . $endpoint;
+
+        if (isset($params) && count($params) > 0) {
+            $url = $url . '?' . http_build_query($params);
+        }
+
         $curl_options = array(
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_VERBOSE => 1,
             CURLOPT_TIMEOUT => $this->_getHelper()->getGlobalConfig('api_timeout_seconds', 2),
             CURLOPT_HTTPHEADER => $this->getHeaders(),
-            CURLOPT_URL => $this->getApiUrl() . $endpoint,
+            CURLOPT_URL => $url,
         );
 
         if ($method === 'POST') {

@@ -6,7 +6,13 @@
         "order_entity_id" => $lastOrder->getEntityId(),
         "order_increment_id" => $lastOrder->getIncrementId(),
         "order_link_detail" => Mage::getUrl('sales/order/view', array('order_id' => $lastOrder->getEntityId())),
-        "payment_method" => $lastOrder->getPayment()->getMethod()
+        "payment_method" => $lastOrder->getPayment()->getMethod(),
+        "store_url" => Mage::getUrl(),
+        "boleto_url" => $this->getUrl('integrai/boleto', array(
+            '_query' => array(
+                    'order_id' => $lastOrder->getIncrementId()
+            )
+        )),
     ));
 
     $pageSuccess = json_encode(Mage::helper('integrai')->getConfigTable('PAYMENT_SUCCESS'));
