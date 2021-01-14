@@ -35,6 +35,7 @@ class Integrai_Core_BoletoController
                 "ok" => false,
                 "error" => $e->getMessage()
             )));
+            $this->_redirect("/");
         }
 
 //        } else {
