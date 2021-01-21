@@ -21,10 +21,12 @@ class Integrai_Core_Model_Api {
             CURLOPT_TIMEOUT => $this->_getHelper()->getGlobalConfig('api_timeout_seconds', 2),
             CURLOPT_HTTPHEADER => $this->getHeaders(),
             CURLOPT_URL => $url,
+            CURLOPT_CUSTOMREQUEST => $method
         );
 
-        if ($method === 'POST') {
-            $curl_options[CURLOPT_POST] = 1;
+        $curl_options[CURLOPT_POST] = $method === 'POST';
+
+        if (!is_null($body) && count($body) > 0) {
             $curl_options[CURLOPT_POSTFIELDS] = json_encode($body);
         }
 
