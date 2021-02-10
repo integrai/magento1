@@ -20,6 +20,9 @@ class Integrai_Core_EventController
             $events = $api->request('/store/event');
 
             $success = [];
+            $errors = [];
+            $this->_getHelper()->log('Total de eventos a processar: ', count($events));
+
             foreach ($events as $event) {
                 $eventId = $event['_id'];
                 $payload = $event['payload'];
@@ -53,6 +56,8 @@ class Integrai_Core_EventController
                 } catch (Exception $e) {
                     $this->_getHelper()->log('Erro ao processar o evento', $event);
                     $this->_getHelper()->log('Erro', $e->getMessage());
+
+                    array_push($errors, $eventId);
                 }
             }
 
@@ -62,6 +67,11 @@ class Integrai_Core_EventController
                     'event_ids' => $success
                 ));
             }
+
+            $this->_getHelper()->log('Eventos processados: ', array(
+                'success' => $success,
+                'errors' => $errors
+            ));
 
             $this->getResponse()->setHeader('Content-type', 'application/json');
             $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array(

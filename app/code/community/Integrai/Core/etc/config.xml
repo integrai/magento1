@@ -113,14 +113,14 @@
             </sales_order_place_after>
 
             <!-- antes de salvar pedido -->
-            <sales_order_save_before>
+            <sales_order_save_after>
                 <observers>
                     <observer>
                         <class>Integrai_Core_Model_Observer</class>
-                        <method>salesOrderBeforeSave</method>
+                        <method>salesOrderAfterSave</method>
                     </observer>
                 </observers>
-            </sales_order_save_before>
+            </sales_order_save_after>
 
             <!-- cancelar pedido -->
             <order_cancel_after>
