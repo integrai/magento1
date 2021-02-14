@@ -11,7 +11,7 @@
         </reference>
 
         <reference name="before_body_end">
-            <block type="core/template" name="beforeBodyEndScript" template="integrai/default/beforeBodyEndScript.phtml" />
+            <block type="core/template" name="allPagesScript" template="integrai/default/allPages.phtml" />
         </reference>
     </default>
 
