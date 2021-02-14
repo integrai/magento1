@@ -1,0 +1,9 @@
+<?php
+    $scripts = Mage::helper('integrai')->getConfigTable('SCRIPTS');
+
+    if (isset($scripts) && count($scripts) > 0) {
+        foreach ($scripts as $script) {
+            echo $script;
+        }
+    }
+?>

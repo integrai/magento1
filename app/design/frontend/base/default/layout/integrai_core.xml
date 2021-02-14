@@ -9,6 +9,10 @@
                 <replace>integrai/js/prototype.js</replace>
             </action>
         </reference>
+
+        <reference name="before_body_end">
+            <block type="core/template" name="beforeBodyEndScript" template="integrai/default/beforeBodyEndScript.phtml" />
+        </reference>
     </default>
 
     <checkout_onepage_success translate="label">
