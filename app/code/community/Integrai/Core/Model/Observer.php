@@ -81,24 +81,20 @@ class Integrai_Core_Model_Observer
         if ($this->_getHelper()->isEventEnabled(self::NEW_ORDER)) {
             /* @var Mage_Sales_Model_Order $order */
             $order = $observer->getOrder();
+            $customer = $this->getCustomerInfo($order);
 
-            $customer = $order->getCustomer()->getData();
             $document = preg_replace('/\D/', '', $customer['taxvat']);
             $customer['document_type'] = strlen($document) > 11 ? 'cnpj' : 'cpf';
 
-            $billing = $order->getBillingAddress()->getData();
-            $billing['street_1'] = $order->getBillingAddress()->getStreet1();
-            $billing['street_2'] = $order->getBillingAddress()->getStreet2();
-            $billing['street_3'] = $order->getBillingAddress()->getStreet3();
-            $billing['street_4'] = $order->getBillingAddress()->getStreet4();
-            $billing['region_code'] = $order->getBillingAddress()->getRegionCode();
+            $billing = array();
+            if ($order->getBillingAddress()) {
+                $billing = $this->getAddress($billing, $order->getBillingAddress());
+            }
 
-            $shipping = $order->getShippingAddress()->getData();
-            $shipping['street_1'] = $order->getShippingAddress()->getStreet1();
-            $shipping['street_2'] = $order->getShippingAddress()->getStreet2();
-            $shipping['street_3'] = $order->getShippingAddress()->getStreet3();
-            $shipping['street_4'] = $order->getShippingAddress()->getStreet4();
-            $shipping['region_code'] = $order->getShippingAddress()->getRegionCode();
+            $shipping = array();
+            if ($order->getShippingAddress()) {
+                $shipping = $this->getAddress($shipping, $order->getShippingAddress());
+            }
 
             $items = array();
             foreach ($order->getAllVisibleItems() as $item) {
@@ -123,25 +119,21 @@ class Integrai_Core_Model_Observer
     {
         if ($this->_getHelper()->isEventEnabled(self::SAVE_ORDER)) {
             /* @var Mage_Sales_Model_Order $order */
-            $order = Mage::getModel('sales/order')->load($observer->getOrder()->getEntityId());
+            $order = $observer->getOrder();
+            $customer = $this->getCustomerInfo($order);
 
-            $customer = $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
             $document = preg_replace('/\D/', '', $customer['taxvat']);
             $customer['document_type'] = strlen($document) > 11 ? 'cnpj' : 'cpf';
 
-            $billing = $order->getBillingAddress()->getData();
-            $billing['street_1'] = $order->getBillingAddress()->getStreet1();
-            $billing['street_2'] = $order->getBillingAddress()->getStreet2();
-            $billing['street_3'] = $order->getBillingAddress()->getStreet3();
-            $billing['street_4'] = $order->getBillingAddress()->getStreet4();
-            $billing['region_code'] = $order->getBillingAddress()->getRegionCode();
+            $billing = array();
+            if ($order->getBillingAddress()) {
+                $billing = $this->getAddress($billing, $order->getBillingAddress());
+            }
 
-            $shipping = $order->getShippingAddress()->getData();
-            $shipping['street_1'] = $order->getShippingAddress()->getStreet1();
-            $shipping['street_2'] = $order->getShippingAddress()->getStreet2();
-            $shipping['street_3'] = $order->getShippingAddress()->getStreet3();
-            $shipping['street_4'] = $order->getShippingAddress()->getStreet4();
-            $shipping['region_code'] = $order->getShippingAddress()->getRegionCode();
+            $shipping = array();
+            if ($order->getShippingAddress()) {
+                $shipping = $this->getAddress($shipping, $order->getShippingAddress());
+            }
 
             $items = array();
             foreach ($order->getAllVisibleItems() as $item) {
@@ -216,5 +208,41 @@ class Integrai_Core_Model_Observer
 
             return $this->_getApi()->sendEvent(self::CUSTOMER_BIRTHDAY, $customers->getData());
         }
+    }
+
+    protected function getAddress($oldAddress, $orderAddress) {
+        $address = $orderAddress->getData();
+        $address['street_1'] = $orderAddress->getStreet1();
+        $address['street_2'] = $orderAddress->getStreet2();
+        $address['street_3'] = $orderAddress->getStreet3();
+        $address['street_4'] = $orderAddress->getStreet4();
+        $address['region_code'] = $orderAddress->getRegionCode();
+        return array_merge($oldAddress, $address);
+    }
+
+    protected function getCustomerInfo($order) {
+        $customer = new Varien_Object();
+
+        if ($order->getCustomerId()) {
+            $customer->setData(Mage::getModel('customer/customer')->load($order->getCustomerId())->getData());
+        } else {
+            $checkout = Mage::getSingleton('checkout/session');
+            $quote = $checkout->getQuote();
+            $billing = $order->getBillingAddress()->getData();
+
+            $this->_getHelper()->log('billing', $billing);
+
+            $customer->setEntityId($quote->getCustomerId());
+            $customer->setGroupId($quote->getCustomerGroupId());
+            $customer->setFirstname($quote->getCustomerFirstname() ? $quote->getCustomerFirstname() : $billing['firstname']);
+            $customer->setLastname($quote->getCustomerLastname() ? $quote->getCustomerLastname() : $billing['lastname']);
+            $customer->setTaxvat($quote->getCustomerTaxvat() ? $quote->getCustomerTaxvat() : $billing['vat_id']);
+            $customer->setEmail($quote->getCustomerEmail());
+            $customer->setDob($quote->getCustomerDob());
+            $customer->setGender($quote->getCustomerGender());
+            $customer->setCreatedAt(date(DATE_ATOM));
+        }
+
+        return $customer->getData();
     }
 }
