@@ -16,6 +16,8 @@ class Integrai_Core_EventController
 //        if ($_SERVER['SERVER_NAME'] === $this->_getHelper()->getGlobalConfig('api_url')) {
 
         try{
+            Mage::app()->setCurrentStore(Mage_Core_Model_App::ADMIN_STORE_ID);
+
             $api = Mage::getModel('integrai/api');
             $events = $api->request('/store/event');
 
@@ -37,16 +39,7 @@ class Integrai_Core_EventController
                             $modelMethods = $modelValue['methods'];
 
                             $model = call_user_func_array(array(Mage, "getModel"), $modelArgs);
-
-                            foreach($modelMethods as $methodKey => $methodValue) {
-                                $methodName = $methodValue['name'];
-                                $methodRun = (bool)$methodValue['run'];
-
-                                if($methodRun) {
-                                    $methodArgs = $this->transformArgs($methodValue);
-                                    $model = call_user_func_array(array($model, $methodName), $methodArgs);
-                                }
-                            }
+                            $model = $this->runMethods($model, $modelMethods);
 
                             $this->_models[$modelName] = $model;
                         }
@@ -90,6 +83,22 @@ class Integrai_Core_EventController
 //        }
     }
 
+    private function runMethods($model, $modelMethods) {
+        $newModel = null;
+
+        foreach($modelMethods as $methodKey => $methodValue) {
+            $methodName = $methodValue['name'];
+            $methodRun = (bool)$methodValue['run'];
+
+            if($methodRun) {
+                $methodArgs = $this->transformArgs($methodValue);
+                $newModel = call_user_func_array(array($model, $methodName), $methodArgs);
+            }
+        }
+
+        return $newModel;
+    }
+
     private function getOtherModel($modelName) {
         return $this->_models[$modelName];
     }
@@ -103,7 +112,12 @@ class Integrai_Core_EventController
 
             foreach($argsFormatted as $arg){
                 if(is_array($arg) && $arg['otherModelName']) {
-                    array_push($newArgs, $this->getOtherModel($arg['otherModelName']));
+                    $model = $this->getOtherModel($arg['otherModelName']);
+                    if ($arg['otherModelMethods']) {
+                        array_push($newArgs, $this->runMethods($model, $arg['otherModelMethods']));
+                    } else {
+                        array_push($newArgs, $model);
+                    }
                 } else {
                     array_push($newArgs, $arg);
                 }
