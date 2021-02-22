@@ -17,9 +17,16 @@ Módulo para integrar sua loja com a Integrai, integrando com diversos parceiros
 rm -rf var/cache/*
 ```
 
-### Composer
+### Instalar usando o [composer](https://getcomposer.org/)
+
+1. Entre na pasta raíz da sua instalação
+2. Digite o seguinte comando:
 ```
 composer require integrai/magento1
+```
+3. Limpe o cache no painel Administrativo em `Sistema > Gerenciamento de Cache`, ou limpe a pasta com o comando abaixo:  
+```bash
+rm -rf var/cache/*
 ```
 
 ## Configuração

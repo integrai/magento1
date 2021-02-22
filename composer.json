@@ -1,0 +1,27 @@
+{
+  "name": "integrai/magento1",
+  "description": "Magento 1 Integrai Extension",
+  "type": "magento-module",
+  "license": [
+    "OSL-3.0",
+    "AFL-3.0"
+  ],
+  "keywords": [
+    "integrai",
+    "magento 1",
+    "integrai magento 1",
+    "magento 1 module",
+    "magento1-module"
+  ],
+  "authors": [
+    {
+      "name": "Integrai",
+      "email": "contato@integrai.com.br",
+      "homepage": "https://www.integrai.com.br",
+      "role": "Technical Support"
+    }
+  ],
+  "require": {
+    "php": ">=5.4"
+  }
+}
