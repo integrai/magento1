@@ -19,7 +19,7 @@ rm -rf var/cache/*
 
 ### Composer
 ```
-composer require integrai/core
+composer require integrai/magento1
 ```
 
 ## Configuração
