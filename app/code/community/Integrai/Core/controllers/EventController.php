@@ -26,6 +26,8 @@ class Integrai_Core_EventController
             $this->_getHelper()->log('Total de eventos a processar: ', count($events));
 
             foreach ($events as $event) {
+                $this->_getHelper()->log('Evento a processar', $event);
+
                 $eventId = $event['_id'];
                 $payload = $event['payload'];
 
@@ -84,19 +86,17 @@ class Integrai_Core_EventController
     }
 
     private function runMethods($model, $modelMethods) {
-        $newModel = null;
-
         foreach($modelMethods as $methodKey => $methodValue) {
             $methodName = $methodValue['name'];
             $methodRun = (bool)$methodValue['run'];
 
-            if($methodRun) {
+            if($methodRun && $model) {
                 $methodArgs = $this->transformArgs($methodValue);
-                $newModel = call_user_func_array(array($model, $methodName), $methodArgs);
+                $model = call_user_func_array(array($model, $methodName), $methodArgs);
             }
         }
 
-        return $newModel;
+        return $model;
     }
 
     private function getOtherModel($modelName) {
