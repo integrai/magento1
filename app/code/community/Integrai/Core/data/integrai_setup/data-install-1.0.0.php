@@ -12,7 +12,8 @@ $configs = array(
         'values' => '{
           "minutes_abandoned_cart_lifetime": 60,
           "api_url": "https://api.integrai.com.br",
-          "api_timeout_seconds": 3
+          "api_timeout_seconds": 15,
+          "process_events_limit": 50
         }',
         'created_at' => strftime('%Y-%m-%d %H:%M:%S', time()),
         'updated_at' => strftime('%Y-%m-%d %H:%M:%S', time()),
@@ -27,6 +28,12 @@ $configs = array(
           "height_default": 2,
           "length_default": 16
         }',
+        'created_at' => strftime('%Y-%m-%d %H:%M:%S', time()),
+        'updated_at' => strftime('%Y-%m-%d %H:%M:%S', time()),
+    ),
+    array(
+        'name' => 'SCRIPTS',
+        'values' => '[]',
         'created_at' => strftime('%Y-%m-%d %H:%M:%S', time()),
         'updated_at' => strftime('%Y-%m-%d %H:%M:%S', time()),
     ),

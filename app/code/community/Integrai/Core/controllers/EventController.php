@@ -12,61 +12,60 @@ class Integrai_Core_EventController
 
     public function indexAction()
     {
-        // check origin
-//        if ($_SERVER['SERVER_NAME'] === $this->_getHelper()->getGlobalConfig('api_url')) {
-
         try{
             Mage::app()->setCurrentStore(Mage_Core_Model_App::ADMIN_STORE_ID);
 
             $api = Mage::getModel('integrai/api');
-            $events = $api->request('/store/event');
 
-            $success = [];
-            $errors = [];
-            $this->_getHelper()->log('Total de eventos a processar: ', count($events));
+            $batchId = isset($_GET['batchId']) ? trim($_GET['batchId']) : "";
+            $events = $api->request(
+                '/store/event',
+                'GET',
+                null,
+                array("batchId" => $batchId)
+            );
 
-            foreach ($events as $event) {
-                $this->_getHelper()->log('Evento a processar', $event);
+            $this->_getHelper()->log('Total de eventos carregados: ', count($events));
 
-                $eventId = $event['_id'];
-                $payload = $event['payload'];
+            if (count($events) > 0) {
+                $eventIds = array_map(function ($event) {
+                    return $event['_id'];
+                }, $events);
 
-                try {
-                    foreach($payload['models'] as $modelKey => $modelValue) {
-                        $modelName = $modelValue['name'];
-                        $modelRun = (bool)$modelValue['run'];
+                $actualEvents = Mage::getModel('integrai/processEvents')
+                    ->getCollection()
+                    ->addFieldToFilter(
+                        'event_id',
+                        array('in' => $eventIds)
+                    )
+                    ->load();
 
-                        if ($modelRun) {
-                            $modelArgs = $this->transformArgs($modelValue);
-                            $modelMethods = $modelValue['methods'];
+                $actualEventIds = array();
+                foreach ($actualEvents as $actualEvent) {
+                    $actualEventIds[] = $actualEvent->getData('event_id');
+                }
 
-                            $model = call_user_func_array(array(Mage, "getModel"), $modelArgs);
-                            $model = $this->runMethods($model, $modelMethods);
+                $data = array();
+                foreach ($events as $event) {
+                    $eventId = $event['_id'];
 
-                            $this->_models[$modelName] = $model;
-                        }
+                    if (!in_array($eventId, $actualEventIds)) {
+                        $data[] = array(
+                            'event_id' => $eventId,
+                            'event' => $event['event'],
+                            'payload' => json_encode($event['payload']),
+                            'created_at' => strftime('%Y-%m-%d %H:%M:%S', time()),
+                        );
                     }
+                }
 
-                    array_push($success, $eventId);
-                } catch (Exception $e) {
-                    $this->_getHelper()->log('Erro ao processar o evento', $event);
-                    $this->_getHelper()->log('Erro', $e->getMessage());
+                $this->_getHelper()->log('Total de eventos agendado para processar: ', count($data));
 
-                    array_push($errors, $eventId);
+                if (count($data) > 0) {
+                    $connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+                    $connection->insertMultiple('integrai_process_events', $data);
                 }
             }
-
-            // Delete events with success
-            if(count($success) > 0){
-                $api->request('/store/event', 'DELETE', array(
-                    'event_ids' => $success
-                ));
-            }
-
-            $this->_getHelper()->log('Eventos processados: ', array(
-                'success' => $success,
-                'errors' => $errors
-            ));
 
             $this->getResponse()->setHeader('Content-type', 'application/json');
             $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array(
@@ -79,51 +78,5 @@ class Integrai_Core_EventController
                 "error" => $e->getMessage()
             )));
         }
-
-//        } else {
-//            $this->_redirect("/");
-//        }
-    }
-
-    private function runMethods($model, $modelMethods) {
-        foreach($modelMethods as $methodKey => $methodValue) {
-            $methodName = $methodValue['name'];
-            $methodRun = (bool)$methodValue['run'];
-
-            if($methodRun && $model) {
-                $methodArgs = $this->transformArgs($methodValue);
-                $model = call_user_func_array(array($model, $methodName), $methodArgs);
-            }
-        }
-
-        return $model;
-    }
-
-    private function getOtherModel($modelName) {
-        return $this->_models[$modelName];
-    }
-
-    private function transformArgs($itemValue) {
-        $newArgs = array();
-
-        $args = isset($itemValue['args']) ? $itemValue['args'] : null;
-        if(is_array($args)) {
-            $argsFormatted = array_values($args);
-
-            foreach($argsFormatted as $arg){
-                if(is_array($arg) && $arg['otherModelName']) {
-                    $model = $this->getOtherModel($arg['otherModelName']);
-                    if ($arg['otherModelMethods']) {
-                        array_push($newArgs, $this->runMethods($model, $arg['otherModelMethods']));
-                    } else {
-                        array_push($newArgs, $model);
-                    }
-                } else {
-                    array_push($newArgs, $arg);
-                }
-            }
-        }
-
-        return $newArgs;
     }
 }

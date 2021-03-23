@@ -41,6 +41,9 @@
                     <events>
                         <table>integrai_events</table>
                     </events>
+                    <process_events>
+                        <table>integrai_process_events</table>
+                    </process_events>
                 </entities>
             </integrai_resource>
         </models>
@@ -208,7 +211,7 @@
         <jobs>
             <integrai_abandoned_cart>
                 <schedule>
-                    <cron_expr>0 */5 * * * *</cron_expr>
+                    <cron_expr>0 */5 * * *</cron_expr>
                 </schedule>
                 <run>
                     <model>integrai/observer::abandonedCart</model>
@@ -226,12 +229,21 @@
 
             <integrai_resend_backup_event>
                 <schedule>
-                    <cron_expr>0 */5 * * * *</cron_expr>
+                    <cron_expr>* * * * *</cron_expr>
                 </schedule>
                 <run>
                     <model>integrai/api::resendBackupEvents</model>
                 </run>
             </integrai_resend_backup_event>
+
+            <integrai_process_events>
+                <schedule>
+                    <cron_expr>* * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>integrai/api::processEvents</model>
+                </run>
+            </integrai_process_events>
         </jobs>
     </crontab>
 </config>

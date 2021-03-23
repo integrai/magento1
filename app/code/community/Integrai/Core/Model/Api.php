@@ -1,6 +1,8 @@
 <?php
 
 class Integrai_Core_Model_Api {
+    protected $_models = array();
+
     protected function _getHelper()
     {
         return Mage::helper('integrai');
@@ -34,6 +36,7 @@ class Integrai_Core_Model_Api {
 
         $response = json_decode(curl_exec($curl), true);
         $info = curl_getinfo($curl);
+        $response_error = isset($response['error']) ? $response['error'] : "Ocorreu um erro, tente novamente";
 
         if($info['http_code'] !== 200) {
             $this->_getHelper()->log("HTTP ERROR", array(
@@ -41,9 +44,11 @@ class Integrai_Core_Model_Api {
                 'error' => curl_error($curl),
                 'response' => $response,
                 'info' => $info,
+                'headers' => $this->getHeaders(),
+                'body' => $body,
             ), Zend_Log::ERR);
 
-            throw new Exception(curl_error($curl));
+            throw new Exception($response_error);
         }
 
         curl_close($curl);
@@ -55,8 +60,6 @@ class Integrai_Core_Model_Api {
     }
 
     private function getHeaders() {
-        $magentoVersion = Mage::getVersion();
-        $moduleVersion = Mage::getConfig()->getModuleConfig("Integrai_Core")->version;
         $apiKey = $this->_getHelper()->getConfig('api_key');
         $secretKey = $this->_getHelper()->getConfig('secret_key');
         $token = base64_encode("{$apiKey}:{$secretKey}");
@@ -64,10 +67,7 @@ class Integrai_Core_Model_Api {
         return array(
             "Content-Type: application/json",
             "Accept: application/json",
-            "Authorization: Basic {$token}",
-            "x-integrai-plaform: magento",
-            "x-integrai-plaform-version: {$magentoVersion}",
-            "x-integrai-module-version: {$moduleVersion}",
+            "Authorization: Basic {$token}"
         );
     }
 
@@ -118,5 +118,135 @@ class Integrai_Core_Model_Api {
                 }
             }
         }
+    }
+
+    public function processEvents() {
+        if ($this->_getHelper()->isEnabled()) {
+            $this->_getHelper()->log('Iniciando processamento dos eventos...');
+
+            $limit = $this->_getHelper()->getConfigTable('GLOBAL', 'process_events_limit', 50);
+            $isRunning = $this->_getHelper()->getConfigTable('PROCESS_EVENTS_RUNNING', null, 'RUNNING', false);
+
+            if ($isRunning === 'RUNNING') {
+                $this->_getHelper()->log('Já existe um processo rodando');
+            } else {
+                $this->_getHelper()->updateConfig('PROCESS_EVENTS_RUNNING', 'RUNNING');
+
+                $events = Mage::getModel('integrai/processEvents')
+                    ->getCollection()
+                    ->setPageSize($limit)
+                    ->setCurPage(1);
+
+                $this->_getHelper()->log('Total de eventos a processar: ', $events->getSize());
+
+                $success = [];
+                $errors = [];
+                $eventIds = [];
+
+                foreach ($events as $event) {
+                    $eventIds[] = $event->getData('id');
+
+                    $this->_getHelper()->log('Evento a processar', $event->getData());
+
+                    $eventId = $event->getData('event_id');
+                    $payload = json_decode($event->getData('payload'), true);
+
+                    try {
+                        if(!isset($payload) || !isset($payload['models']) || !is_array($payload['models'])) {
+                            throw new \Exception('Evento sem payload');
+                        }
+
+                        foreach($payload['models'] as $modelKey => $modelValue) {
+                            $modelName = $modelValue['name'];
+                            $modelRun = (bool)$modelValue['run'];
+
+                            if ($modelRun) {
+                                $modelArgs = $this->transformArgs($modelValue);
+                                $modelMethods = $modelValue['methods'];
+
+                                $model = call_user_func_array(array(Mage, "getModel"), $modelArgs);
+                                $model = $this->runMethods($model, $modelMethods);
+
+                                $this->_models[$modelName] = $model;
+                            }
+                        }
+
+                        array_push($success, $eventId);
+                    } catch (Exception $e) {
+                        $this->_getHelper()->log('Erro ao processar o evento', $event);
+                        $this->_getHelper()->log('Erro', $e->getMessage());
+
+                        if ($eventId) {
+                            array_push($errors, array(
+                                "eventId" => $eventId,
+                                "error" => $e->getMessage()
+                            ));
+                        }
+                    }
+                }
+
+                // Delete events with success
+                if (count($success) > 0 || count($errors) > 0) {
+                    $this->request('/store/event', 'DELETE', array(
+                        'event_ids' => $success,
+                        'errors' => $errors
+                    ));
+
+                    $eventIdsRemove = implode(', ', $eventIds);
+                    $connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+                    $connection->delete('integrai_process_events', "id in ($eventIdsRemove)");
+
+                    $this->_getHelper()->log('Eventos processados: ', array(
+                        'success' => $success,
+                        'errors' => $errors
+                    ));
+                }
+
+                $this->_getHelper()->updateConfig('PROCESS_EVENTS_RUNNING', 'NOT_RUNNING');
+            }
+        }
+    }
+
+    private function runMethods($model, $modelMethods) {
+        foreach($modelMethods as $methodKey => $methodValue) {
+            $methodName = $methodValue['name'];
+            $methodRun = (bool)$methodValue['run'];
+
+            if($methodRun && $model) {
+                $methodArgs = $this->transformArgs($methodValue);
+                $model = call_user_func_array(array($model, $methodName), $methodArgs);
+            }
+        }
+
+        return $model;
+    }
+
+    private function getOtherModel($modelName) {
+        return $this->_models[$modelName];
+    }
+
+    private function transformArgs($itemValue) {
+        $newArgs = array();
+
+        $args = isset($itemValue['args']) ? $itemValue['args'] : null;
+        if(is_array($args)) {
+            $argsFormatted = array_values($args);
+
+            foreach($argsFormatted as $arg){
+                if(is_array($arg) && isset($arg['otherModelName'])) {
+                    $model = $this->getOtherModel($arg['otherModelName']);
+
+                    if (isset($arg['otherModelMethods'])) {
+                        array_push($newArgs, $this->runMethods($model, $arg['otherModelMethods']));
+                    } else {
+                        array_push($newArgs, $model);
+                    }
+                } else {
+                    array_push($newArgs, $arg);
+                }
+            }
+        }
+
+        return $newArgs;
     }
 }

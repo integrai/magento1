@@ -34,6 +34,15 @@ class Integrai_Core_Helper_Data extends Mage_Core_Helper_Abstract  {
         return $values;
     }
 
+    public function updateConfig($name, $value) {
+        $config = Mage::getModel('integrai/config')->load($name, 'name');
+
+        $config->setName($name)
+            ->setValues($value)
+            ->setUpdatedAt(strftime('%Y-%m-%d %H:%M:%S', time()))
+            ->save();
+    }
+
     public function isEnabled() {
         return $this->getConfig('enable');
     }
@@ -50,4 +59,5 @@ class Integrai_Core_Helper_Data extends Mage_Core_Helper_Abstract  {
     public function isLoggedIn() {
         return Mage::getSingleton('customer/session')->isLoggedIn();
     }
+
 }
