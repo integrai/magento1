@@ -3,7 +3,7 @@
 <config>
     <modules>
         <Integrai_Core>
-            <version>1.0.0</version>
+            <version>1.0.3</version>
         </Integrai_Core>
     </modules>
 
