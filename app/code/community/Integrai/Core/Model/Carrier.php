@@ -70,12 +70,12 @@ class Integrai_Core_Model_Carrier
                 continue;
             }
 
-            $attribute_width   = $this->_getHelper()->getConfigTable('SHIPPING', 'attribute_width');
-            $attribute_height  = $this->_getHelper()->getConfigTable('SHIPPING', 'attribute_height');
-            $attribute_length  = $this->_getHelper()->getConfigTable('SHIPPING', 'attribute_length');
-            $width_default     = $this->_getHelper()->getConfigTable('SHIPPING', 'width_default');
-            $height_default    = $this->_getHelper()->getConfigTable('SHIPPING', 'height_default');
-            $length_default    = $this->_getHelper()->getConfigTable('SHIPPING', 'length_default');
+            $attribute_width   = $this->_getHelper()->getConfigTable('SHIPPING', 'attributeWidth');
+            $attribute_height  = $this->_getHelper()->getConfigTable('SHIPPING', 'attributeHeight');
+            $attribute_length  = $this->_getHelper()->getConfigTable('SHIPPING', 'attributeLength');
+            $width_default     = $this->_getHelper()->getConfigTable('SHIPPING', 'widthFefault');
+            $height_default    = $this->_getHelper()->getConfigTable('SHIPPING', 'heightDefault');
+            $length_default    = $this->_getHelper()->getConfigTable('SHIPPING', 'lengthDefault');
 
             /** @var Mage_Sales_Model_Quote_Item $item */
 

@@ -11,7 +11,7 @@ class Integrai_Core_BoletoController
     public function indexAction()
     {
         // check origin
-//        if ($_SERVER['SERVER_NAME'] === $this->_getHelper()->getGlobalConfig('api_url')) {
+//        if ($_SERVER['SERVER_NAME'] === $this->_getHelper()->getGlobalConfig('apiUrl')) {
 
         try{
             $order_id = trim($_GET['order_id']);
@@ -21,13 +21,13 @@ class Integrai_Core_BoletoController
 
             $api = Mage::getModel('integrai/api');
             $response_boleto = $api->request('/store/boleto', 'GET', null, array(
-                'order_id' => $order_id,
-                'is_duplicate' => $is_duplicate
+                'orderId' => $order_id,
+                'isDuplicate' => $is_duplicate
             ));
 
             $this->getResponse()->setHeader('Content-type', 'application/json');
             $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array(
-                'boleto_url' => $response_boleto['boleto_url']
+                'boleto_url' => $response_boleto['boletoUrl']
             )));
         } catch (Exception $e) {
             $this->_getHelper()->log('Error ao buscar boleto', $e->getMessage());

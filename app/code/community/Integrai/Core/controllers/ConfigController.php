@@ -11,7 +11,7 @@ class Integrai_Core_ConfigController
     public function indexAction()
     {
         // check origin
-//        if ($_SERVER['SERVER_NAME'] === $this->_getHelper()->getGlobalConfig('api_url')) {
+//        if ($_SERVER['SERVER_NAME'] === $this->_getHelper()->getGlobalConfig('apiUrl')) {
 
         try{
             $this->_getHelper()->log('Buscando novas configurações...');

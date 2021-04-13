@@ -167,7 +167,7 @@ class Integrai_Core_Model_Observer
 
     public function abandonedCart() {
         if ($this->_getHelper()->isEventEnabled(self::ABANDONED_CART)) {
-            $minutes = $this->_getHelper()->getGlobalConfig('minutes_abandoned_cart_lifetime', 60);
+            $minutes = $this->_getHelper()->getGlobalConfig('minutesAbandonedCartLifetime', 60);
             $fromDate = date('Y-m-d H:i:s', strtotime('-'.$minutes. ' minutes'));
             $toDate = date('Y-m-d H:i:s', strtotime("now"));
 

@@ -20,7 +20,7 @@ class Integrai_Core_Model_Api {
         $curl_options = array(
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_VERBOSE => 1,
-            CURLOPT_TIMEOUT => $this->_getHelper()->getGlobalConfig('api_timeout_seconds', 2),
+            CURLOPT_TIMEOUT => $this->_getHelper()->getGlobalConfig('apiTimeoutSeconds', 2),
             CURLOPT_HTTPHEADER => $this->getHeaders(),
             CURLOPT_URL => $url,
             CURLOPT_CUSTOMREQUEST => $method
@@ -56,7 +56,7 @@ class Integrai_Core_Model_Api {
     }
 
     private function getApiUrl() {
-        return $this->_getHelper()->getGlobalConfig('api_url');
+        return $this->_getHelper()->getGlobalConfig('apiUrl');
     }
 
     private function getHeaders() {
@@ -124,7 +124,7 @@ class Integrai_Core_Model_Api {
         if ($this->_getHelper()->isEnabled()) {
             $this->_getHelper()->log('Iniciando processamento dos eventos...');
 
-            $limit = $this->_getHelper()->getConfigTable('GLOBAL', 'process_events_limit', 50);
+            $limit = $this->_getHelper()->getConfigTable('GLOBAL', 'processEventsLimit', 50);
             $isRunning = $this->_getHelper()->getConfigTable('PROCESS_EVENTS_RUNNING', null, 'RUNNING', false);
 
             if ($isRunning === 'RUNNING') {
