@@ -22,7 +22,9 @@ class Integrai_Core_Model_Carrier
     {
         if ($this->_getHelper()->isEventEnabled(self::QUOTE)) {
             try{
+                $this->_getHelper()->log('Start');
                 $params = $this->prepareParamsRequest($request);
+                $this->_getHelper()->log('Start params', $params);
                 $services = $this->_getApi()->request('/quote/shipping', 'POST', $params);
                 /** @var Mage_Shipping_Model_Rate_Result $result */
                 $result = Mage::getModel('shipping/rate_result');
@@ -51,13 +53,13 @@ class Integrai_Core_Model_Carrier
         }
 
         return array(
-            "destination_zipcode" => $request->getDestPostcode(),
-            "cart_total_price" => $request->getPackageValue(),
-            "cart_total_quantity" => $request->getPackageQty(),
-            "cart_total_weight" => $request->getPackageWeight(),
-            "cart_total_height" => $request->getPackageHeight(),
-            "cart_total_width" => $request->getPackageWidth(),
-            "cart_total_length" => $request->getPackageDepth(),
+            "destinationZipCode" => $request->getDestPostcode(),
+            "cartTotalPrice" => $request->getPackageValue(),
+            "cartTotalQuantity" => $request->getPackageQty(),
+            "cartTotalWeight" => $request->getPackageWeight(),
+            "cartTotalHeight" => $request->getPackageHeight(),
+            "cartTotalWidth" => $request->getPackageWidth(),
+            "cartTotalLength" => $request->getPackageDepth(),
             "items" => $this->prepareItems($request->getAllItems()),
         );
     }
@@ -90,7 +92,7 @@ class Integrai_Core_Model_Carrier
                 "length" => (float) $length,
                 "quantity" => (int) max(1, $item->getQty()),
                 "sku" => (string) $item->getSku(),
-                "unit_price" => (float) $item->getBasePrice(),
+                "unitPrice" => (float) $item->getBasePrice(),
                 "product" => (object) $item->getProduct()->getData(),
             );
         }
