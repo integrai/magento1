@@ -134,6 +134,16 @@
                     </observer>
                 </observers>
             </order_cancel_after>
+
+            <!-- notificações no detalhe do pedido no admin -->
+            <core_block_abstract_to_html_after>
+                <observers>
+                    <observer>
+                        <class>Integrai_Core_Model_Observer</class>
+                        <method>getSalesOrderViewInfo</method>
+                    </observer>
+                </observers>
+            </core_block_abstract_to_html_after>
         </events>
 
     </global>
@@ -171,6 +181,14 @@
                 </integrai_core>
             </modules>
         </translate>
+
+        <layout>
+            <updates>
+                <integrai_core>
+                    <file>integrai_core.xml</file>
+                </integrai_core>
+            </updates>
+        </layout>
     </adminhtml>
 
     <default>

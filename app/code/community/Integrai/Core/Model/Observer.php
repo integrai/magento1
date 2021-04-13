@@ -245,4 +245,16 @@ class Integrai_Core_Model_Observer
 
         return $customer->getData();
     }
+
+    public function getSalesOrderViewInfo(Varien_Event_Observer $observer) {
+        $block = $observer->getBlock();
+        if (($block->getNameInLayout() == 'order_info') && ($child = $block->getChild('integrai.order.info.custom.block'))) {
+            $transport = $observer->getTransport();
+            if ($transport) {
+                $html = $transport->getHtml();
+                $html .= $child->toHtml();
+                $transport->setHtml($html);
+            }
+        }
+    }
 }
