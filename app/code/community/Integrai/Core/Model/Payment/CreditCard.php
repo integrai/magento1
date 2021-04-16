@@ -15,6 +15,8 @@ class Integrai_Core_Model_Payment_CreditCard extends Mage_Payment_Model_Method_A
     protected $_isGateway               = true;
     protected $_formBlockType = 'integrai/payment_creditCard';
 
+    const NEW_ORDER = 'NEW_ORDER';
+
     protected function _getHelper()
     {
         return Mage::helper('integrai');
@@ -22,7 +24,7 @@ class Integrai_Core_Model_Payment_CreditCard extends Mage_Payment_Model_Method_A
 
     public function isAvailable($quote = null)
     {
-        return true;
+        return $this->_getHelper()->isEventEnabled(self::NEW_ORDER);
     }
 
     public function getPaymentCreditCardConfig()

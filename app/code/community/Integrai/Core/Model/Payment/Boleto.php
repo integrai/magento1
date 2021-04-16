@@ -8,6 +8,8 @@ class Integrai_Core_Model_Payment_Boleto extends Mage_Payment_Model_Method_Abstr
     protected $_canUseForMultishipping  = false;
     protected $_formBlockType = 'integrai/payment_boleto';
 
+    const NEW_ORDER = 'NEW_ORDER';
+
     protected function _getHelper()
     {
         return Mage::helper('integrai');
@@ -15,7 +17,7 @@ class Integrai_Core_Model_Payment_Boleto extends Mage_Payment_Model_Method_Abstr
 
     public function isAvailable($quote = null)
     {
-        return true;
+        return $this->_getHelper()->isEventEnabled(self::NEW_ORDER);
     }
 
     public function getPaymentBoletoConfig()

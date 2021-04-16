@@ -53,7 +53,7 @@ class Integrai_Core_Model_Carrier
         }
 
         return array(
-            "destinationZipCode" => $request->getDestPostcode(),
+            "destinationZipCode" => $zipCode,
             "cartTotalPrice" => $request->getPackageValue(),
             "cartTotalQuantity" => $request->getPackageQty(),
             "cartTotalWeight" => $request->getPackageWeight(),
@@ -75,7 +75,7 @@ class Integrai_Core_Model_Carrier
             $attribute_width   = $this->_getHelper()->getConfigTable('SHIPPING', 'attributeWidth');
             $attribute_height  = $this->_getHelper()->getConfigTable('SHIPPING', 'attributeHeight');
             $attribute_length  = $this->_getHelper()->getConfigTable('SHIPPING', 'attributeLength');
-            $width_default     = $this->_getHelper()->getConfigTable('SHIPPING', 'widthFefault');
+            $width_default     = $this->_getHelper()->getConfigTable('SHIPPING', 'widthDefault');
             $height_default    = $this->_getHelper()->getConfigTable('SHIPPING', 'heightDefault');
             $length_default    = $this->_getHelper()->getConfigTable('SHIPPING', 'lengthDefault');
 

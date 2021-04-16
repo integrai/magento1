@@ -146,8 +146,6 @@ class Integrai_Core_Model_Api {
                 foreach ($events as $event) {
                     $eventIds[] = $event->getData('id');
 
-                    $this->_getHelper()->log('Evento a processar', $event->getData());
-
                     $eventId = $event->getData('event_id');
                     $payload = json_decode($event->getData('payload'), true);
 
@@ -188,7 +186,7 @@ class Integrai_Core_Model_Api {
                 // Delete events with success
                 if (count($success) > 0 || count($errors) > 0) {
                     $this->request('/store/event', 'DELETE', array(
-                        'event_ids' => $success,
+                        'eventIds' => $success,
                         'errors' => $errors
                     ));
 
@@ -211,10 +209,19 @@ class Integrai_Core_Model_Api {
         foreach($modelMethods as $methodKey => $methodValue) {
             $methodName = $methodValue['name'];
             $methodRun = (bool)$methodValue['run'];
+            $methodCheckReturnType = $methodValue['checkReturnType'];
 
             if($methodRun && $model) {
                 $methodArgs = $this->transformArgs($methodValue);
                 $model = call_user_func_array(array($model, $methodName), $methodArgs);
+
+                if ($methodCheckReturnType) {
+                    $types = (array) $methodCheckReturnType['types'];
+                    $errorMessage = $methodCheckReturnType['errorMessage'];
+                    if (!in_array(gettype($model), $types)) {
+                        throw new Exception($errorMessage);
+                    }
+                }
             }
         }
 
