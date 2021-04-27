@@ -7,5 +7,12 @@
                    template="integrai_core/notification.phtml"
                    before="sales_order_edit" />
         </reference>
+
+        <reference name="order_payment">
+            <block type="integrai/adminhtml_sales_order_view_info_payment"
+                   name="integrai.order.info.custom.payment"
+                   template="integrai_core/payment_info.phtml"
+                   before="order_payment" />
+        </reference>
     </adminhtml_sales_order_view>
 </layout>

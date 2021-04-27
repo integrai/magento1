@@ -1,0 +1,57 @@
+<?php
+    $order = $this->getOrder();
+    $additionalInformation = $order->getPayment()->getData('additional_information');
+?>
+
+<?php if($additionalInformation['module_name']): ?>
+<div>
+    <strong>Processado por: </strong> <?php echo $additionalInformation['module_name']; ?>
+</div>
+<?php endif; ?>
+
+<?php if($additionalInformation['transaction_id']): ?>
+<div>
+    <strong>Identificação da transação: </strong> <?php echo $additionalInformation['transaction_id']; ?>
+</div>
+<?php endif; ?>
+
+<?php if($additionalInformation['date_approved']): ?>
+<div>
+    <strong>Data de pagamento: </strong> <?php echo $additionalInformation['date_approved']; ?>
+</div>
+<?php endif; ?>
+
+<?php if($additionalInformation['payment_method'] === 'boleto'): ?>
+    <?php if($additionalInformation['boleto_url']): ?>
+    <div>
+        <button title="Imprimir boleto" type="button" class="scalable go" onclick="setLocation('<?php echo $additionalInformation['boleto_url']; ?>')">
+            <span>
+                <span>
+                    <span>Imprimir boleto</span>
+                </span>
+            </span>
+        </button>
+    </div>
+    <?php endif; ?>
+<?php endif; ?>
+
+<?php if($additionalInformation['payment_method'] === 'credit_card' && isset($additionalInformation['card'])): ?>
+    <div style="margin: 0.5em 0;">
+        <h3>Dados do cartão de crédito</h3>
+        <div>
+            <strong>Parcelas: </strong> <?php echo $additionalInformation['installments']; ?>
+        </div>
+        <div>
+            <strong>Número do cartão: </strong> **** **** **** <?php echo $additionalInformation['card']['last_four_digits']; ?>
+        </div>
+        <div>
+            <strong>Nome do titular: </strong> <?php echo $additionalInformation['card']['holder']; ?>
+        </div>
+        <div>
+            <strong>Data de expiração: </strong> <?php echo $additionalInformation['card']['expiration_month']; ?> / <?php echo $additionalInformation['card']['expiration_year']; ?>
+        </div>
+        <div>
+            <strong>Bandeira: </strong> <?php echo strtoupper($additionalInformation['card']['brand']); ?>
+        </div>
+    </div>
+<?php endif; ?>
