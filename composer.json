@@ -1,7 +1,7 @@
 {
   "name": "integrai/magento1",
   "description": "Magento 1 Integrai Extension",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "type": "magento-module",
   "license": [
     "OSL-3.0",
