@@ -10,10 +10,10 @@ $configs = array(
     array(
         'name' => 'GLOBAL',
         'values' => '{
-          "minutes_abandoned_cart_lifetime": 60,
-          "api_url": "https://api.integrai.com.br",
-          "api_timeout_seconds": 15,
-          "process_events_limit": 50
+          "minutesAbandonedCartLifetime": 60,
+          "apiUrl": "https://api.integrai.com.br",
+          "apiTimeoutSeconds": 15,
+          "processEventsLimit": 50
         }',
         'created_at' => strftime('%Y-%m-%d %H:%M:%S', time()),
         'updated_at' => strftime('%Y-%m-%d %H:%M:%S', time()),
@@ -21,12 +21,12 @@ $configs = array(
     array(
         'name' => 'SHIPPING',
         'values' => '{
-          "attribute_width": "width",
-          "attribute_height": "height",
-          "attribute_length": "length",
-          "width_default": 11,
-          "height_default": 2,
-          "length_default": 16
+          "attributeWidth": "width",
+          "attributeHeight": "height",
+          "attributeLength": "length",
+          "widthDefault": 11,
+          "heightDefault": 2,
+          "lengthDefault": 16
         }',
         'created_at' => strftime('%Y-%m-%d %H:%M:%S', time()),
         'updated_at' => strftime('%Y-%m-%d %H:%M:%S', time()),

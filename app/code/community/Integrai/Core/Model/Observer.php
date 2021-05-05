@@ -11,7 +11,9 @@ class Integrai_Core_Model_Observer
     const NEWSLETTER_SUBSCRIBER = 'NEWSLETTER_SUBSCRIBER';
     const ADD_PRODUCT_CART = 'ADD_PRODUCT_CART';
     const ABANDONED_CART = 'ABANDONED_CART';
+    const ABANDONED_CART_ITEM = 'ABANDONED_CART_ITEM';
     const NEW_ORDER = 'NEW_ORDER';
+    const NEW_ORDER_ITEM = 'NEW_ORDER_ITEM';
     const SAVE_ORDER = 'SAVE_ORDER';
     const CANCEL_ORDER = 'CANCEL_ORDER';
 
@@ -101,6 +103,8 @@ class Integrai_Core_Model_Observer
                 $items[] = $item->getData();
             }
 
+            $order->setTotalItems(count($items));
+
             $data = new Varien_Object();
             $data->setOrder($order->getData());
             $data->setCustomer($customer);
@@ -111,7 +115,16 @@ class Integrai_Core_Model_Observer
             $data->setShippingMethod($order->getShippingMethod());
             $data->setShippingMethodDetail($order->getShippingMethod(true));
 
-            return $this->_getApi()->sendEvent(self::NEW_ORDER, $data->getData());
+            $this->_getApi()->sendEvent(self::NEW_ORDER, $data->getData());
+
+            if ($this->_getHelper()->isEventEnabled(self::NEW_ORDER_ITEM)) {
+                foreach ($items as $item) {
+                    $item['order_id'] = $order->getIncrementId();
+                    $item['customer'] = $customer;
+
+                    $this->_getApi()->sendEvent(self::NEW_ORDER_ITEM, $item);
+                }
+            }
         }
     }
 
@@ -181,21 +194,38 @@ class Integrai_Core_Model_Observer
                 ->load();
 
             $abandonedCart = array();
-            foreach ($quotes as $quote) {
-                $data = new Varien_Object();
-                $data->setQuote($quote->getData());
-                $items = array_map(function($item) {
-                    $newItem = new Varien_Object();
-                    $newItem->addData($item->getData());
-                    $newItem->setProduct($item->getProduct()->getData());
-                    return $newItem->getData();
-                }, $quote->getAllItems());
-                $data->setItems($items);
-                $data->setCustomer($quote->getCustomer()->getData());
-                array_push($abandonedCart, $data->getData());
-            }
 
-            return $this->_getApi()->sendEvent(self::ABANDONED_CART, $abandonedCart);
+            if (count($quotes) > 0) {
+                foreach ($quotes as $quote) {
+                    $customer = $quote->getCustomer();
+
+                    $data = new Varien_Object();
+                    $data->setCartId($quote->getId());
+                    $data->setQuote($quote->getData());
+                    $items = array_map(function($item, $quote) {
+                        $newItem = new Varien_Object();
+                        $newItem->addData($item->getData());
+                        $newItem->setCartId($quote->getId());
+                        $newItem->setProduct($item->getProduct()->getData());
+                        return $newItem->getData();
+                    }, $quote->getAllItems());
+                    $data->setItems($items);
+                    $data->setQuantity(count($items));
+                    $data->setCustomer($customer->getData());
+                    $data->setCreatedAt($quote->getData('created_at'));
+
+                    $this->_getApi()->sendEvent(self::ABANDONED_CART, $data->getData());
+
+                    if ($this->_getHelper()->isEventEnabled(self::ABANDONED_CART_ITEM)) {
+                        foreach ($items as $item) {
+                            $item->setCartId($quote->getId());
+                            $item->setCustomer($customer->getData());
+
+                            $this->_getApi()->sendEvent(self::ABANDONED_CART_ITEM, $item->getData());
+                        }
+                    }
+                }
+            }
         }
     }
 
