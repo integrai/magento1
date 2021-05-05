@@ -190,25 +190,26 @@ class Integrai_Core_Model_Observer
                 ->addFieldToFilter('is_active', 1)
                 ->addFieldToFilter('items_count', array('gt' => 0))
                 ->addFieldToFilter('customer_email', array('notnull' => true))
-                ->addFieldToFilter('created_at', array('from'=>$fromDate, 'to'=>$toDate))
+                ->addFieldToFilter('updated_at', ['lteq' => $toDate])
+                ->addFieldToFilter('updated_at', ['gteq' => $fromDate])
                 ->load();
 
-            $abandonedCart = array();
-
-            if (count($quotes) > 0) {
+            if ($quotes->count() > 0) {
                 foreach ($quotes as $quote) {
                     $customer = $quote->getCustomer();
 
                     $data = new Varien_Object();
                     $data->setCartId($quote->getId());
                     $data->setQuote($quote->getData());
-                    $items = array_map(function($item, $quote) {
+                    $items = array();
+                    foreach ($quote->getAllItems() as $item) {
                         $newItem = new Varien_Object();
                         $newItem->addData($item->getData());
                         $newItem->setCartId($quote->getId());
                         $newItem->setProduct($item->getProduct()->getData());
-                        return $newItem->getData();
-                    }, $quote->getAllItems());
+
+                        $items[] = $newItem->getData();
+                    }
                     $data->setItems($items);
                     $data->setQuantity(count($items));
                     $data->setCustomer($customer->getData());
@@ -218,8 +219,7 @@ class Integrai_Core_Model_Observer
 
                     if ($this->_getHelper()->isEventEnabled(self::ABANDONED_CART_ITEM)) {
                         foreach ($items as $item) {
-                            $item->setCartId($quote->getId());
-                            $item->setCustomer($customer->getData());
+                            $item['customer'] = $customer->getData();
 
                             $this->_getApi()->sendEvent(self::ABANDONED_CART_ITEM, $item->getData());
                         }
