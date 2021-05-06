@@ -202,7 +202,7 @@ class Integrai_Core_Model_Observer
                     $data->setCartId($quote->getId());
                     $data->setQuote($quote->getData());
                     $items = array();
-                    foreach ($quote->getAllItems() as $item) {
+                    foreach ($quote->getAllVisibleItems() as $item) {
                         $newItem = new Varien_Object();
                         $newItem->addData($item->getData());
                         $newItem->setCartId($quote->getId());
