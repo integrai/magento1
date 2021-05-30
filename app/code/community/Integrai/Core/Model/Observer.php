@@ -32,6 +32,9 @@ class Integrai_Core_Model_Observer
         if ($this->_getHelper()->isEventEnabled(self::SAVE_CUSTOMER)) {
             /* @var Mage_Customer_Model_Customer $customer */
             $customer = $observer->getCustomer();
+            $document = preg_replace('/\D/', '', $customer['taxvat']);
+            $customer['document_type'] = strlen($document) > 11 ? 'cnpj' : 'cpf';
+
             return $this->_getApi()->sendEvent(self::SAVE_CUSTOMER, $customer->getData());
         }
     }
