@@ -21,7 +21,9 @@
             <action method="setTemplate"><template>page/1column.phtml</template></action>
         </reference>
         <reference name="checkout.success">
-            <action method="setTemplate"><template>integrai/checkout/success.phtml</template></action>
+            <action method="setTemplate">
+                <template helper="integrai/pageSuccessTemplate"></template>
+            </action>
         </reference>
     </checkout_onepage_success>
 </layout>

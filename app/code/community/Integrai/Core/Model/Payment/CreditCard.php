@@ -24,7 +24,9 @@ class Integrai_Core_Model_Payment_CreditCard extends Mage_Payment_Model_Method_A
 
     public function isAvailable($quote = null)
     {
-        return $this->_getHelper()->isEventEnabled(self::NEW_ORDER);
+        $formOptions = $this->_getHelper()->getConfigTable('PAYMENT_CREDITCARD', 'formOptions', array());
+        $gateways = isset($formOptions) && is_array($formOptions) ? $formOptions['gateways'] : array();
+        return $this->_getHelper()->isEventEnabled(self::NEW_ORDER) && count($gateways) > 0;
     }
 
     public function getPaymentCreditCardConfig()

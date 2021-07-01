@@ -17,7 +17,9 @@ class Integrai_Core_Model_Payment_Boleto extends Mage_Payment_Model_Method_Abstr
 
     public function isAvailable($quote = null)
     {
-        return $this->_getHelper()->isEventEnabled(self::NEW_ORDER);
+        $formOptions = $this->_getHelper()->getConfigTable('PAYMENT_BOLETO', 'formOptions', array());
+        $gateways = isset($formOptions) && is_array($formOptions) ? $formOptions['gateways'] : array();
+        return $this->_getHelper()->isEventEnabled(self::NEW_ORDER) && count($gateways) > 0;
     }
 
     public function getPaymentBoletoConfig()
