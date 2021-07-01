@@ -60,4 +60,11 @@ class Integrai_Core_Helper_Data extends Mage_Core_Helper_Abstract  {
         return Mage::getSingleton('customer/session')->isLoggedIn();
     }
 
+    public function pageSuccessTemplate() {
+        $lastOrder = Mage::getModel('sales/order')
+            ->loadByIncrementId(Mage::getSingleton('checkout/session')->getLastRealOrderId());
+        $paymentMethod = $lastOrder->getPayment()->getMethod();
+
+        return stripos($paymentMethod, 'integrai') === false ? 'checkout/success.phtml' : 'integrai/checkout/success.phtml';
+    }
 }
