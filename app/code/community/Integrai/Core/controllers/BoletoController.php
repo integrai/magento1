@@ -14,6 +14,10 @@ class Integrai_Core_BoletoController
             $order_id = $this->getRequest()->getParam('order_id');
             $is_duplicate = (bool)$this->getRequest()->getParam('is_duplicate');
 
+            if (!$order_id) {
+                throw new Exception('Informe o ID do pedido');
+            }
+
             $this->_getHelper()->log('Buscando boleto url do pedido: ', $order_id);
 
             $api = Mage::getModel('integrai/api');
@@ -24,13 +28,19 @@ class Integrai_Core_BoletoController
 
             $this->getResponse()->setHeader('Content-type', 'application/json');
             $this->getResponse()->setBody(Mage::helper('core')->jsonEncode($response));
+        } catch (Throwable $e) {
+            $this->error_handling($e);
         } catch (Exception $e) {
-            $this->_getHelper()->log('Error ao buscar boleto', $e->getMessage());
-            $this->getResponse()->setHeader('Content-type', 'application/json');
-            $this->getResponse()->setHttpResponseCode(400)->setBody(Mage::helper('core')->jsonEncode(array(
-                "boletoUrl" => null,
-                "error" => $e->getMessage()
-            )));
+            $this->error_handling($e);
         }
+    }
+
+    private function error_handling($e) {
+        $this->_getHelper()->log('Error ao buscar boleto', $e->getMessage());
+        $this->getResponse()->setHeader('Content-type', 'application/json');
+        $this->getResponse()->setHttpResponseCode(400)->setBody(Mage::helper('core')->jsonEncode(array(
+            "boletoUrl" => null,
+            "error" => $e->getMessage()
+        )));
     }
 }
