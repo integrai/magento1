@@ -13,6 +13,11 @@
                     'order_id' => $lastOrder->getIncrementId()
             )
         )),
+        "pix_url" => $this->getUrl('integrai/pix', array(
+            '_query' => array(
+                    'order_id' => $lastOrder->getIncrementId()
+            )
+        )),
     ));
 
     $pageSuccess = json_encode(Mage::helper('integrai')->getConfigTable('PAYMENT_SUCCESS'));

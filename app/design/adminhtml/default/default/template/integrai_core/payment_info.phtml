@@ -22,6 +22,16 @@ if(!empty($additionalInformation)):
     <?php endif; ?>
 
     <?php if(!empty($additionalInformation['payment_method'])): ?>
+        <?php if($additionalInformation['payment_method'] === 'pix' && !empty($additionalInformation['qr_code_base64']) && !empty($additionalInformation['qr_code'])): ?>
+            <div style="margin-top: 1rem">
+                <img height="150" style="height: 150px" src="data:image/jpeg;base64,<?php echo $additionalInformation['qr_code_base64']; ?>"/>
+                <div>
+                    <strong>Código QR: </strong>
+                </div>
+                <input style="width: 80%;padding: .5rem;" readonly value="<?php echo $additionalInformation['qr_code']; ?>">
+            </div>
+        <?php endif; ?>
+
         <?php if($additionalInformation['payment_method'] === 'boleto' && !empty($additionalInformation['boleto_url'])): ?>
             <div style="margin-top: 1rem">
                 <button title="Imprimir boleto" type="button" class="scalable go" onclick="setLocation('<?php echo $additionalInformation['boleto_url']; ?>')">
