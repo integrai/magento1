@@ -10,9 +10,6 @@ class Integrai_Core_ConfigController
 
     public function indexAction()
     {
-        // check origin
-//        if ($_SERVER['SERVER_NAME'] === $this->_getHelper()->getGlobalConfig('apiUrl')) {
-
         try{
             $this->_getHelper()->log('Buscando novas configurações...');
             $api = Mage::getModel('integrai/api');
@@ -39,17 +36,19 @@ class Integrai_Core_ConfigController
             $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array(
                 "ok" => true,
             )));
+        } catch (Throwable $e) {
+            $this->error_handling($e);
         } catch (Exception $e) {
-            $this->_getHelper()->log('Error ao atualizar configs', $e->getMessage());
-            $this->getResponse()->setHttpResponseCode(400)->setBody(Mage::helper('core')->jsonEncode(array(
-                "ok" => false,
-                "error" => $e->getMessage()
-            )));
+            $this->error_handling($e);
         }
+    }
 
-//        } else {
-//            $this->_redirect("/");
-//        }
+    private function error_handling($e) {
+        $this->_getHelper()->log('Error ao atualizar configs', $e->getMessage());
+        $this->getResponse()->setHttpResponseCode(400)->setBody(Mage::helper('core')->jsonEncode(array(
+            "ok" => false,
+            "error" => $e->getMessage()
+        )));
     }
 
     public function attributesAction() {

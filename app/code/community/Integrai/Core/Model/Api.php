@@ -79,12 +79,18 @@ class Integrai_Core_Model_Api {
             ));
             $this->_getHelper()->log($eventName, 'Enviado com sucesso');
             return $response;
+        } catch (Throwable $e) {
+            $this->error_handling($e, $resend, $eventName, $payload);
         } catch (Exception $e) {
-            if(!$resend) {
-                $this->_backupEvent($eventName, $payload);
-            } else {
-                throw new Exception($e);
-            }
+            $this->error_handling($e, $resend, $eventName, $payload);
+        }
+    }
+
+    private function error_handling($e, $resend, $eventName, $payload) {
+        if(!$resend) {
+            $this->_backupEvent($eventName, $payload);
+        } else {
+            throw new Exception($e);
         }
     }
 
@@ -113,6 +119,8 @@ class Integrai_Core_Model_Api {
                     $this->sendEvent($eventName, $payload, true);
                     $this->_getHelper()->log('DELETE');
                     $event->delete();
+                } catch (Throwable $e) {
+                    $this->_getHelper()->log('Error ao reenviar o evento', $eventName, Zend_Log::ERR);
                 } catch (Exception $e) {
                     $this->_getHelper()->log('Error ao reenviar o evento', $eventName, Zend_Log::ERR);
                 }
@@ -170,16 +178,10 @@ class Integrai_Core_Model_Api {
                         }
 
                         array_push($success, $eventId);
+                    } catch (Throwable $e) {
+                        $this->error_handling_process_events($e, $event, $eventId, $errors);
                     } catch (Exception $e) {
-                        $this->_getHelper()->log('Erro ao processar o evento', $event);
-                        $this->_getHelper()->log('Erro', $e->getMessage());
-
-                        if ($eventId) {
-                            array_push($errors, array(
-                                "eventId" => $eventId,
-                                "error" => $e->getMessage()
-                            ));
-                        }
+                        $this->error_handling_process_events($e, $event, $eventId, $errors);
                     }
                 }
 
@@ -202,6 +204,18 @@ class Integrai_Core_Model_Api {
 
                 $this->_getHelper()->updateConfig('PROCESS_EVENTS_RUNNING', 'NOT_RUNNING');
             }
+        }
+    }
+
+    private function error_handling_process_events($e, $event, $eventId, $errors) {
+        $this->_getHelper()->log('Erro ao processar o evento', $event);
+        $this->_getHelper()->log('Erro', $e->getMessage());
+
+        if ($eventId) {
+            array_push($errors, array(
+                "eventId" => $eventId,
+                "error" => $e->getMessage()
+            ));
         }
     }
 

@@ -32,17 +32,23 @@ class Integrai_Core_Model_Carrier
                     $result->append($this->transformRate($service));
                 }
                 return $result;
+            } catch (Throwable $e) {
+                return $this->error_handling($e);
             } catch (Exception $e) {
-                $error = Mage::getModel('shipping/rate_result_error');
-                $data  = [
-                    'carrier'       => $this->_code,
-                    'carrier_title' => $this->_getHelper()->getCarrierConfig('title'),
-                    'error_message' => $e->getMessage(),
-                ];
-                $error->setData($data);
-                return $error;
+                return $this->error_handling($e);
             }
         }
+    }
+
+    private function error_handling($e) {
+        $error = Mage::getModel('shipping/rate_result_error');
+        $data  = [
+            'carrier'       => $this->_code,
+            'carrier_title' => $this->_getHelper()->getCarrierConfig('title'),
+            'error_message' => $e->getMessage(),
+        ];
+        $error->setData($data);
+        return $error;
     }
 
     private function prepareParamsRequest(Mage_Shipping_Model_Rate_Request $request) {
