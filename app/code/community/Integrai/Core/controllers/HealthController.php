@@ -47,12 +47,18 @@ class Integrai_Core_HealthController
             $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array(
                 'ok' => true
             )));
+        } catch (Throwable $e) {
+            $this->error_handling($e);
         } catch (Exception $e) {
-            $this->_getHelper()->log('Error ao atualizar configs', $e->getMessage());
-            $this->getResponse()->setHttpResponseCode(400)->setBody(Mage::helper('core')->jsonEncode(array(
-                "ok" => false,
-                "error" => $e->getMessage()
-            )));
+            $this->error_handling($e);
         }
+    }
+
+    private function error_handling($e) {
+        $this->_getHelper()->log('Error ao atualizar configs', $e->getMessage());
+        $this->getResponse()->setHttpResponseCode(400)->setBody(Mage::helper('core')->jsonEncode(array(
+            "ok" => false,
+            "error" => $e->getMessage()
+        )));
     }
 }
