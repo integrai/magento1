@@ -1,0 +1,21 @@
+<script>
+    const {
+        formOptions = {},
+        scripts = [],
+    } = JSON.parse('<?php echo $this->getPaymentPixConfig() ?>');
+
+    window.IntegraiPix = {
+        ...formOptions,
+        pixModel: JSON.parse('<?php echo $this->getCustomer() ?>'),
+    };
+
+    scripts.forEach(function (script) {
+        let scriptElm = document.createElement('script');
+        scriptElm.src = script;
+        document.head.appendChild(scriptElm);
+    });
+</script>
+
+<div class="form-list" id="payment_form_<?php echo $this->getMethodCode() ?>" style="display:none;">
+    <div id="integrai-payment-pix"></div>
+</div>

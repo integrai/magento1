@@ -208,6 +208,13 @@
         </carriers>
 
         <payment>
+            <integrai_pix>
+                <active>1</active>
+                <model>Integrai_Core_Model_Payment_Pix</model>
+                <title>Pix</title>
+                <payment_action>sale</payment_action>
+                <sort_order>0</sort_order>
+            </integrai_pix>
             <integrai_boleto>
                 <active>1</active>
                 <model>Integrai_Core_Model_Payment_Boleto</model>
