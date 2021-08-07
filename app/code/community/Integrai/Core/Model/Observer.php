@@ -103,7 +103,16 @@ class Integrai_Core_Model_Observer
 
             $items = array();
             foreach ($order->getAllVisibleItems() as $item) {
-                $items[] = $item->getData();
+              $categoryIds = $item->getProduct()->getCategoryIds();
+              $categories = array();
+
+              foreach ($categoryIds as $categoryId) {
+                $category = Mage::getModel('catalog/category')->load($categoryId);
+                $categories += array($category->getData());
+              }
+
+              $item['categories'] = $categories;
+              $items[] = $item->getData();
             }
 
             $order->setTotalItems(count($items));
