@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
     <name>Integrai</name>
-    <version>1.0.12</version>
+    <version>1.0.13</version>
     <stability>stable</stability>
     <license>OSL v3.0</license>
     <channel>community</channel>
