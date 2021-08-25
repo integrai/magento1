@@ -133,12 +133,18 @@ class Integrai_Core_Model_Api {
             $this->_getHelper()->log('Iniciando processamento dos eventos...');
 
             $limit = $this->_getHelper()->getConfigTable('GLOBAL', 'processEventsLimit', 50);
+            $timeout = $this->_getHelper()->getConfigTable('GLOBAL', 'processEventsTimeoutHours', 1);
             $isRunning = $this->_getHelper()->getConfigTable('PROCESS_EVENTS_RUNNING', null, 'NOT_RUNNING', false);
+            $lastRunning = $this->_getHelper()->getConfigTable('LAST_PROCESS_EVENTS_RUN', null, null, false);
+            $now = date('Y-m-d H:i:s');
+            $dateDiff = date_diff(date_create($now), date_create($lastRunning));
+            $interval = $dateDiff->format('%h');
 
-            if ($isRunning === 'RUNNING') {
+            if ($isRunning === 'RUNNING' && $lastRunning && $interval < $timeout) {
                 $this->_getHelper()->log('Já existe um processo rodando');
             } else {
                 $this->_getHelper()->updateConfig('PROCESS_EVENTS_RUNNING', 'RUNNING');
+                $this->_getHelper()->updateConfig('LAST_PROCESS_EVENTS_RUN', $now);
 
                 $events = Mage::getModel('integrai/processEvents')
                     ->getCollection()
