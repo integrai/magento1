@@ -18,7 +18,7 @@ class Integrai_Core_Model_Payment_Pix extends Mage_Payment_Model_Method_Abstract
     public function isAvailable($quote = null)
     {
         $formOptions = $this->_getHelper()->getConfigTable('PAYMENT_PIX', 'formOptions', array());
-        $gateways = isset($formOptions) && is_array($formOptions) ? $formOptions['gateways'] : array();
+        $gateways = isset($formOptions) && is_array($formOptions) && isset($formOptions['gateways']) ? $formOptions['gateways'] : array();
         return $this->_getHelper()->isEventEnabled(self::NEW_ORDER) && count($gateways) > 0;
     }
 
