@@ -7,11 +7,20 @@ class Integrai_Core_Model_Product {
     }
 
     public function savePhotos($productId, $photos) {
-        $this->_getHelper()->log('photos product', $photos);
-
         $product = Mage::getModel('catalog/product')->load($productId);
 
         if ($product->getId() && isset($photos) && count($photos) > 0) {
+            $mediaApi = Mage::getModel('catalog/product_attribute_media_api');
+            $items = $mediaApi->items($product->getId());
+
+            if (count($items) > 0) {
+                foreach($items as $item) {
+                    $mediaApi->remove($product->getId(), $item['file']);
+                }
+                $product->save();
+                $product = Mage::getModel('catalog/product')->load($productId);
+            }
+
             $mediaFolder = Mage::getBaseDir('media') . DS . 'tmp' . DS . 'integrai' . DS;
 
             if (!is_dir($mediaFolder)) {
