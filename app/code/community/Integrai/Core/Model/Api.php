@@ -185,9 +185,9 @@ class Integrai_Core_Model_Api {
 
                         array_push($success, $eventId);
                     } catch (Throwable $e) {
-                        $this->error_handling_process_events($e, $event, $eventId, $errors);
+                        array_push($errors, $this->error_handling_process_events($e, $event, $eventId));
                     } catch (Exception $e) {
-                        $this->error_handling_process_events($e, $event, $eventId, $errors);
+                        array_push($errors, $this->error_handling_process_events($e, $event, $eventId));
                     }
                 }
 
@@ -213,15 +213,15 @@ class Integrai_Core_Model_Api {
         }
     }
 
-    private function error_handling_process_events($e, $event, $eventId, $errors) {
-        $this->_getHelper()->log('Erro ao processar o evento', $event);
+    private function error_handling_process_events($e, $event, $eventId) {
+        $this->_getHelper()->log('Erro ao processar o evento', $event->getData());
         $this->_getHelper()->log('Erro', $e->getMessage());
 
         if ($eventId) {
-            array_push($errors, array(
+            return array(
                 "eventId" => $eventId,
                 "error" => $e->getMessage()
-            ));
+            );
         }
     }
 
