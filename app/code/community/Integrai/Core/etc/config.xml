@@ -144,6 +144,16 @@
                     </observer>
                 </observers>
             </core_block_abstract_to_html_after>
+
+            <!-- criar ou edita produto -->
+            <catalog_product_save_before>
+                <observers>
+                    <observer>
+                        <class>Integrai_Core_Model_Observer</class>
+                        <method>createOrEditProduct</method>
+                    </observer>
+                </observers>
+            </catalog_product_save_before>
         </events>
 
     </global>

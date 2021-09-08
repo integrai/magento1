@@ -16,6 +16,8 @@ class Integrai_Core_Model_Observer
     const NEW_ORDER_ITEM = 'NEW_ORDER_ITEM';
     const SAVE_ORDER = 'SAVE_ORDER';
     const CANCEL_ORDER = 'CANCEL_ORDER';
+    const CREATE_PRODUCT = 'CREATE_PRODUCT';
+    const UPDATE_PRODUCT = 'UPDATE_PRODUCT';
 
     protected function _getHelper()
     {
@@ -297,6 +299,15 @@ class Integrai_Core_Model_Observer
                 $html .= $child->toHtml();
                 $transport->setHtml($html);
             }
+        }
+    }
+
+    public function createOrEditProduct(Varien_Event_Observer $observer) {
+        $product = $observer->getEvent()->getProduct();
+        $event = $product->isObjectNew() ? self::CREATE_PRODUCT : self::UPDATE_PRODUCT;
+
+        if ($this->_getHelper()->isEventEnabled($event)) {
+            return $this->_getApi()->sendEvent($event, $product->getData());
         }
     }
 }
