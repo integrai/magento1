@@ -73,4 +73,33 @@ class Integrai_Core_ConfigController
         $this->getResponse()->setHeader('Content-type', 'application/json');
         $this->getResponse()->setBody(Mage::helper('core')->jsonEncode($options));
     }
+
+    public function categoriesAction() {
+        $categories = $this->transformCategory(1);
+        $this->getResponse()->setHeader('Content-type', 'application/json');
+        $this->getResponse()->setBody(Mage::helper('core')->jsonEncode($categories));
+    }
+
+    private function transformCategory($parentId) {
+        $categories = Mage::getModel('catalog/category')
+            ->getCollection()
+            ->addAttributeToSelect('name')
+            ->addAttributeToFilter('parent_id', $parentId);
+
+        $options = array();
+        foreach ($categories as $category) {
+            $item = array(
+                "id" => $category->getId(),
+                "label" => $category->getName(),
+            );
+
+            if ($category->hasChildren()) {
+                $item['children'] = $this->transformCategory($category->getId());
+            }
+
+            $options[] = $item;
+        }
+
+        return $options;
+    }
 }
