@@ -303,11 +303,82 @@ class Integrai_Core_Model_Observer
     }
 
     public function createOrEditProduct(Varien_Event_Observer $observer) {
-        $product = $observer->getEvent()->getProduct();
-        $event = $product->isObjectNew() ? self::CREATE_PRODUCT : self::UPDATE_PRODUCT;
+        $productEvent = $observer->getEvent()->getProduct();
+        $event = $productEvent->isObjectNew() ? self::CREATE_PRODUCT : self::UPDATE_PRODUCT;
+        $product = Mage::getModel('catalog/product')->load($productEvent->getId());
 
         if ($this->_getHelper()->isEventEnabled($event)) {
-            return $this->_getApi()->sendEvent($event, $product->getData());
+            $data = $this->enrichProductAttributes($product);
+            $data['photos'] = $this->getProductPhotos($product);
+            $data['categories'] = $this->getProductCategories($product);
+            $data['stock_data'] = $product->getStockItem()->getData();
+
+            if ($product->getTypeId() == 'configurable') {
+                $variations = $childProducts = Mage::getModel('catalog/product_type_configurable')
+                    ->getUsedProducts(null, $product);;
+
+                $data['variations'] = array();
+                foreach ($variations as $variation) {
+                    $productVariation = Mage::getModel('catalog/product')->load($variation->getId());
+                    $variationData = $this->enrichProductAttributes($productVariation);
+                    $variationData['photos'] = $this->getProductPhotos($productVariation);
+                    $variationData['categories'] = $this->getProductCategories($productVariation);
+                    $variationData['stock_data'] = $productVariation->getStockItem()->getData();
+                    array_push($data['variations'], $variationData);
+                }
+            }
+
+            $this->_getHelper()->log("product", $data);
+
+            return $this->_getApi()->sendEvent(self::CREATE_PRODUCT, $data);
         }
+    }
+
+    private function getProductPhotos($product) {
+        $photos = array();
+        $media_gallery = $product->getData('media_gallery');
+
+        foreach ($product->getMediaGalleryImages() as $image) {
+            array_push($photos, $image->getUrl());
+        }
+
+        return $photos;
+    }
+
+    private function enrichProductAttributes($product) {
+        $data = $product->getData();
+        $attributes = Mage::getResourceModel('catalog/product_attribute_collection');
+        $attributes->addFieldToFilter('is_user_defined',1);
+        $attributes->addFieldToFilter('entity_type_id', 4);
+        $attributes->addFieldToFilter('frontend_input', array("select", "multiselect"));
+        foreach($attributes as $attributeInfo)
+        {
+            if (isset($data[$attributeInfo->getAttributeCode()])) {
+                $data[$attributeInfo->getAttributeCode()] = $product->getAttributeText($attributeInfo->getAttributeCode());
+            }
+        }
+        return $data;
+    }
+
+    private function getProductCategories($product) {
+        $categoriesList = array();
+
+        $categoryIds = $product->getCategoryIds();
+
+        if (is_array($categoryIds) && count($categoryIds) > 0) {
+            $categories = Mage::getModel('catalog/category')
+                ->getCollection()
+                ->addAttributeToSelect('name')
+                ->addAttributeToFilter('entity_id', array('in'=>$categoryIds));
+
+            foreach ($categories as $category) {
+                array_push($categoriesList, array(
+                    "id" => $category->getId(),
+                    "label" => $category->getName()
+                ));
+            }
+        }
+
+        return $categoriesList;
     }
 }
