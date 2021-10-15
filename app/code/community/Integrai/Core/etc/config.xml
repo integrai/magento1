@@ -146,14 +146,24 @@
             </core_block_abstract_to_html_after>
 
             <!-- criar ou edita produto -->
-            <catalog_product_save_before>
+            <catalog_product_save_after>
                 <observers>
                     <observer>
                         <class>Integrai_Core_Model_Observer</class>
                         <method>createOrEditProduct</method>
                     </observer>
                 </observers>
-            </catalog_product_save_before>
+            </catalog_product_save_after>
+
+            <!-- deletar produto -->
+            <catalog_product_delete_after>
+                <observers>
+                    <observer>
+                        <class>Integrai_Core_Model_Observer</class>
+                        <method>deleteProduct</method>
+                    </observer>
+                </observers>
+            </catalog_product_delete_after>
         </events>
 
     </global>

@@ -18,6 +18,7 @@ class Integrai_Core_Model_Observer
     const CANCEL_ORDER = 'CANCEL_ORDER';
     const CREATE_PRODUCT = 'CREATE_PRODUCT';
     const UPDATE_PRODUCT = 'UPDATE_PRODUCT';
+    const DELETE_PRODUCT = 'DELETE_PRODUCT';
 
     protected function _getHelper()
     {
@@ -331,6 +332,14 @@ class Integrai_Core_Model_Observer
             $this->_getHelper()->log("product", $data);
 
             return $this->_getApi()->sendEvent(self::CREATE_PRODUCT, $data);
+        }
+    }
+
+    public function deleteProduct(Varien_Event_Observer $observer) {
+        $productEvent = $observer->getEvent()->getProduct();
+
+        if ($this->_getHelper()->isEventEnabled(self::DELETE_PRODUCT)) {
+            return $this->_getApi()->sendEvent(self::DELETE_PRODUCT, $productEvent->getData());
         }
     }
 
