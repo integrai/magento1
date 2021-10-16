@@ -78,6 +78,25 @@ class Integrai_Core_EventController
         }
     }
 
+    public function sendAction() {
+        try{
+            $data = json_decode($this->getRequest()->getRawBody(), true);
+            $payload = $data['payload'];
+            $this->_getHelper()->log('Executando evento', $data['event']);
+
+            $response = Mage::getModel('integrai/processEvent')->process($payload);
+
+            return $this->getResponse()->setBody(Mage::helper('core')->jsonEncode($response));
+        } catch (\Throwable $e) {
+            $this->_getHelper()->log('Erro ao executar o evento', $e->getMessage());
+
+            return $this->getResponse()->setHttpResponseCode(400)->setBody(Mage::helper('core')->jsonEncode(array(
+                "ok" => false,
+                "error" => $e->getMessage()
+            )));
+        }
+    }
+
     private function error_handling($e) {
         $this->_getHelper()->log('Error ao atualizar configs', $e->getMessage());
         $this->getResponse()->setHttpResponseCode(400)->setBody(Mage::helper('core')->jsonEncode(array(
