@@ -9,8 +9,6 @@ class Integrai_Core_Block_Adminhtml_Sales_Order_View_Info_Payment extends Mage_C
     public function getPaymentResponse() {
         $order = $this->getOrder();
         $paymentAdditionalInformation = $order->getPayment()->getData('additional_information');
-        $this->_getHelper()->log('info', $paymentAdditionalInformation);
-        $this->_getHelper()->log('info 2', $order->getPayment()->getData());
         return isset($paymentAdditionalInformation['payment_response']) ? $paymentAdditionalInformation['payment_response'] : array();
     }
 

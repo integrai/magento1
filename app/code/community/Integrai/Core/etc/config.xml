@@ -249,6 +249,13 @@
                 <payment_action>sale</payment_action>
                 <sort_order>1</sort_order>
             </integrai_creditcard>
+            <integrai_marketplace>
+                <active>1</active>
+                <model>Integrai_Core_Model_Payment_MarketPlace</model>
+                <title>Marketplace</title>
+                <payment_action>sale</payment_action>
+                <sort_order>1</sort_order>
+            </integrai_marketplace>
         </payment>
     </default>
 

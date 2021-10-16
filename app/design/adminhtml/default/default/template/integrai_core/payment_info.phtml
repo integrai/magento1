@@ -9,6 +9,12 @@ if(!empty($additionalInformation)):
         </div>
     <?php endif; ?>
 
+    <?php if(!empty($additionalInformation['marketplace_id'])): ?>
+        <div>
+            <strong>Nº Pedido Marketplace: </strong> <?php echo $additionalInformation['marketplace_id']; ?>
+        </div>
+    <?php endif; ?>
+
     <?php if(!empty($additionalInformation['transaction_id'])): ?>
         <div>
             <strong>Identificação da transação: </strong> <?php echo $additionalInformation['transaction_id']; ?>
