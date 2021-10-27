@@ -81,7 +81,7 @@ class Integrai_Core_Model_Order {
         $shippingDescription = $orderData['order']['shipping_carrier'] . ' - ' . $orderData['order']['shipping_method'];
         $shippingPrice = $orderData['order']['shipping_amount'];
 
-        $order->setExtOrderId($orderData['order']['id']);
+        $order->setExtOrderId($orderData['order']['external_id']);
         $order->setShippingAmount($shippingPrice);
         $order->setBaseShippingAmount($shippingPrice);
         $order->setShippingDescription($shippingDescription);
@@ -89,10 +89,8 @@ class Integrai_Core_Model_Order {
         $order->setGrandTotal($order->getSubtotal() + $shippingPrice);
         $order->setBaseGrandTotal($order->getSubtotal() + $shippingPrice);
         $order->getPayment()->setAdditionalInformation(array(
-            "payment_response" => array(
-                "module_name" => $orderData['order']['marketplace'],
-                "marketplace_id" => $orderData['order']['id'],
-            )
+            "marketplace" => isset($orderData['marketplace']) ? $orderData['marketplace'] : '',
+            "payments" => isset($orderData['payments']) ? $orderData['payments'] : ''
         ));
         $order->save();
 

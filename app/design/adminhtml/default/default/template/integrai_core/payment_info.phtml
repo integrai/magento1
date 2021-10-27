@@ -2,87 +2,79 @@
 $additionalInformation = $this->getPaymentResponse();
 
 if(!empty($additionalInformation)):
+    $marketplace_data = $additionalInformation['marketplace_data'];
+    $payments = $additionalInformation['payments'];
 ?>
-    <?php if(!empty($additionalInformation['module_name'])): ?>
-        <div>
-            <strong>Processado por: </strong> <?php echo $additionalInformation['module_name']; ?>
-        </div>
+    <?php if(count($marketplace_data) > 0): ?>
+        <h4>Dados marketplace</h4>
+        <p>
+            <?php
+            foreach ($marketplace_data as $key => $value) {
+                if (!empty($value)) {
+                    echo '<div><strong>' . $key . ':</strong> ' . $value . '</div>';
+                }
+            }
+            ?>
+        </p>
+        <hr />
     <?php endif; ?>
 
-    <?php if(!empty($additionalInformation['marketplace_id'])): ?>
-        <div>
-            <strong>Nº Pedido Marketplace: </strong> <?php echo $additionalInformation['marketplace_id']; ?>
-        </div>
-    <?php endif; ?>
+    <?php if(count($payments) > 0): ?>
+        <p>
+        <?php foreach ($payments as $index => $payment_data):?>
+            <?php
+            if(count($payments) > 1) {
+                echo '<strong>' . ($index + 1) . 'º forma de pagamento</strong>';
+            }
+            ?>
 
-    <?php if(!empty($additionalInformation['transaction_id'])): ?>
-        <div>
-            <strong>Identificação da transação: </strong> <?php echo $additionalInformation['transaction_id']; ?>
-        </div>
-    <?php endif; ?>
+            <p>
+            <?php foreach ($payment_data as $key => $value): ?>
+                <?php if(!empty($value) && !is_object($value) && !is_array($value)): ?>
+                    <div><strong><?php echo $key ?></strong> <?php echo $value; ?></div>
+                <?php endif; ?>
 
-    <?php if(!empty($additionalInformation['date_approved'])): ?>
-        <div>
-            <strong>Data de pagamento: </strong> <?php echo $additionalInformation['date_approved']; ?>
-        </div>
-    <?php endif; ?>
-
-    <?php if(!empty($additionalInformation['payment_method'])): ?>
-        <?php if($additionalInformation['payment_method'] === 'pix' && !empty($additionalInformation['qr_code_base64']) && !empty($additionalInformation['qr_code'])): ?>
-            <div style="margin-top: 1rem">
-                <img height="150" style="height: 150px" src="data:image/jpeg;base64,<?php echo $additionalInformation['qr_code_base64']; ?>"/>
-                <div>
-                    <strong>Código QR: </strong>
-                </div>
-                <input style="width: 80%;padding: .5rem;" readonly value="<?php echo $additionalInformation['qr_code']; ?>">
-            </div>
-        <?php endif; ?>
-
-        <?php if($additionalInformation['payment_method'] === 'boleto' && !empty($additionalInformation['boleto_url'])): ?>
-            <div style="margin-top: 1rem">
-                <button title="Imprimir boleto" type="button" class="scalable go" onclick="setLocation('<?php echo $additionalInformation['boleto_url']; ?>')">
-                        <span>
+                <?php if($key == 'boleto' && is_array($value) && !empty($value['url'])): ?>
+                    <div style="margin-top: 1rem">
+                        <button title="Imprimir boleto" type="button" class="scalable go" onclick="setLocation('<?php echo $value['url']; ?>')">
                             <span>
-                                <span>Imprimir boleto</span>
+                                <span>
+                                    <span>Imprimir boleto</span>
+                                </span>
                             </span>
-                        </span>
-                </button>
-            </div>
-        <?php endif; ?>
-
-        <?php if($additionalInformation['payment_method'] === 'credit_card' && isset($additionalInformation['card'])): ?>
-            <div style="margin: 0.5em 0;">
-                <h3>Dados do cartão de crédito</h3>
-                <?php if(!empty($additionalInformation['installments'])): ?>
-                <div>
-                    <strong>Parcelas: </strong> <?php echo $additionalInformation['installments']; ?>
-                </div>
+                        </button>
+                    </div>
                 <?php endif; ?>
 
-                <?php if(!empty($additionalInformation['card']['last_four_digits'])): ?>
-                <div>
-                    <strong>Número do cartão: </strong> **** **** **** <?php echo $additionalInformation['card']['last_four_digits']; ?>
-                </div>
+                <?php if($key == 'pix' && is_array($value)): ?>
+                    <div style="margin-top: 1rem">
+                    <?php if(!empty($value['qr_code_base64']) || !empty($value['qr_code_image'])): ?>
+                        <img
+                            height="150"
+                            style="height: 150px"
+                            src="<?php echo isset($value['qr_code_base64']) ? 'data:image/jpeg;base64,' . $value['qr_code_base64'] : $value['qr_code_image']; ?>"/>
+                    <?php endif; ?>
+                    <?php if(!empty($value['qr_code'])): ?>
+                        <div>
+                            <strong>Código QR: </strong>
+                        </div>
+                        <input style="width: 80%;padding: .5rem;" readonly value="<?php echo $value['qr_code']; ?>">
+                    <?php endif; ?>
+                    </div>
                 <?php endif; ?>
 
-                <?php if(!empty($additionalInformation['card']['holder'])): ?>
-                <div>
-                    <strong>Nome do titular: </strong> <?php echo $additionalInformation['card']['holder']; ?>
-                </div>
-                <?php endif; ?>
-
-                <?php if(!empty($additionalInformation['card']['expiration_month']) && !empty($additionalInformation['card']['expiration_year'])): ?>
-                <div>
-                    <strong>Data de expiração: </strong> <?php echo $additionalInformation['card']['expiration_month']; ?> / <?php echo $additionalInformation['card']['expiration_year']; ?>
-                </div>
-                <?php endif; ?>
-
-                <?php if(!empty($additionalInformation['card']['brand'])): ?>
-                <div>
-                    <strong>Bandeira: </strong> <?php echo strtoupper($additionalInformation['card']['brand']); ?>
-                </div>
-                <?php endif; ?>
-            </div>
-        <?php endif; ?>
+                <?php
+                if ($key == 'card' && is_array($value)) {
+                    foreach ($value as $cardKey => $cardValue) {
+                        if (!empty($cardValue)) {
+                            echo '<div><strong>' . $cardKey . ':</strong> ' . $cardValue . '</div>';
+                        }
+                    }
+                }
+                ?>
+            <?php endforeach; ?>
+            </p>
+        <?php endforeach; ?>
+        </p>
     <?php endif; ?>
 <?php endif; ?>
