@@ -6,16 +6,15 @@ class Integrai_Core_Model_Observer
      * Tipos de Evento
      * */
 
-    const SAVE_CUSTOMER = 'SAVE_CUSTOMER';
+    const CREATE_CUSTOMER = 'CREATE_CUSTOMER';
     const CUSTOMER_BIRTHDAY = 'CUSTOMER_BIRTHDAY';
-    const NEWSLETTER_SUBSCRIBER = 'NEWSLETTER_SUBSCRIBER';
+    const CREATE_LEAD = 'CREATE_LEAD';
     const ADD_PRODUCT_CART = 'ADD_PRODUCT_CART';
     const ABANDONED_CART = 'ABANDONED_CART';
     const ABANDONED_CART_ITEM = 'ABANDONED_CART_ITEM';
-    const NEW_ORDER = 'NEW_ORDER';
-    const NEW_ORDER_ITEM = 'NEW_ORDER_ITEM';
-    const SAVE_ORDER = 'SAVE_ORDER';
-    const CANCEL_ORDER = 'CANCEL_ORDER';
+    const CREATE_ORDER = 'CREATE_ORDER';
+    const UPDATE_ORDER_ITEM = 'UPDATE_ORDER_ITEM';
+    const UPDATE_ORDER = 'UPDATE_ORDER';
     const CREATE_PRODUCT = 'CREATE_PRODUCT';
     const UPDATE_PRODUCT = 'UPDATE_PRODUCT';
     const DELETE_PRODUCT = 'DELETE_PRODUCT';
@@ -32,19 +31,19 @@ class Integrai_Core_Model_Observer
 
     public function customerRegisterSuccess(Varien_Event_Observer $observer)
     {
-        if ($this->_getHelper()->isEventEnabled(self::SAVE_CUSTOMER)) {
+        if ($this->_getHelper()->isEventEnabled(self::CREATE_CUSTOMER)) {
             /* @var Mage_Customer_Model_Customer $customer */
-            $customer = $observer->getCustomer();
+            $customer = $observer->getCustomer()->getData();
             $document = preg_replace('/\D/', '', $customer['taxvat']);
             $customer['document_type'] = strlen($document) > 11 ? 'cnpj' : 'cpf';
 
-            return $this->_getApi()->sendEvent(self::SAVE_CUSTOMER, $customer->getData());
+            return $this->_getApi()->sendEvent(self::CREATE_CUSTOMER, $customer);
         }
     }
 
     public function newsletterSubscriberSaveAfter(Varien_Event_Observer $observer)
     {
-        if ($this->_getHelper()->isEventEnabled(self::NEWSLETTER_SUBSCRIBER)) {
+        if ($this->_getHelper()->isEventEnabled(self::CREATE_LEAD)) {
             /* @var Mage_Newsletter_Model_Subscriber $subscriber */
             $subscriber = $observer->getEvent()->getSubscriber();
             if ($subscriber->getIsStatusChanged()) {
@@ -57,7 +56,7 @@ class Integrai_Core_Model_Observer
                     $customer = Mage::getModel('customer/customer')->load($customer_id);
                     $newsletter->setData('subscriber_name', $customer->getName());
                 }
-                return $this->_getApi()->sendEvent(self::NEWSLETTER_SUBSCRIBER, $newsletter->getData());
+                return $this->_getApi()->sendEvent(self::CREATE_LEAD, $newsletter->getData());
             }
         }
     }
@@ -86,7 +85,7 @@ class Integrai_Core_Model_Observer
 
     public function salesOrderPlaceAfter(Varien_Event_Observer $observer)
     {
-        if ($this->_getHelper()->isEventEnabled(self::NEW_ORDER)) {
+        if ($this->_getHelper()->isEventEnabled(self::CREATE_ORDER)) {
             /* @var Mage_Sales_Model_Order $order */
             $order = $observer->getOrder();
             $customer = $this->getCustomerInfo($order);
@@ -130,14 +129,14 @@ class Integrai_Core_Model_Observer
             $data->setShippingMethod($order->getShippingMethod());
             $data->setShippingMethodDetail($order->getShippingMethod(true));
 
-            $this->_getApi()->sendEvent(self::NEW_ORDER, $data->getData());
+            $this->_getApi()->sendEvent(self::CREATE_ORDER, $data->getData());
 
-            if ($this->_getHelper()->isEventEnabled(self::NEW_ORDER_ITEM)) {
+            if ($this->_getHelper()->isEventEnabled(self::UPDATE_ORDER_ITEM)) {
                 foreach ($items as $item) {
                     $item['order_id'] = $order->getIncrementId();
                     $item['customer'] = $customer;
 
-                    $this->_getApi()->sendEvent(self::NEW_ORDER_ITEM, $item);
+                    $this->_getApi()->sendEvent(self::UPDATE_ORDER_ITEM, $item);
                 }
             }
         }
@@ -145,7 +144,7 @@ class Integrai_Core_Model_Observer
 
     public function salesOrderAfterSave(Varien_Event_Observer $observer)
     {
-        if ($this->_getHelper()->isEventEnabled(self::SAVE_ORDER)) {
+        if ($this->_getHelper()->isEventEnabled(self::UPDATE_ORDER)) {
             /* @var Mage_Sales_Model_Order $order */
             $order = $observer->getOrder();
             $customer = $this->getCustomerInfo($order);
@@ -178,18 +177,18 @@ class Integrai_Core_Model_Observer
             $data->setShippingMethod($order->getShippingMethod());
             $data->setShippingMethodDetail($order->getShippingMethod(true));
 
-            $this->_getHelper()->log("SAVE_ORDER ID", $observer->getOrder()->getEntityId());
+            $this->_getHelper()->log("UPDATE_ORDER ID", $observer->getOrder()->getEntityId());
 
-            return $this->_getApi()->sendEvent(self::SAVE_ORDER, $data->getData());
+            return $this->_getApi()->sendEvent(self::UPDATE_ORDER, $data->getData());
         }
     }
 
     public function orderCancelAfter(Varien_Event_Observer $observer)
     {
-        if ($this->_getHelper()->isEventEnabled(self::CANCEL_ORDER)) {
+        if ($this->_getHelper()->isEventEnabled(self::UPDATE_ORDER)) {
             /* @var Mage_Sales_Model_Order $order */
             $order = $observer->getOrder();
-            return $this->_getApi()->sendEvent(self::CANCEL_ORDER, $order->getData());
+            return $this->_getApi()->sendEvent(self::UPDATE_ORDER, $order->getData());
         }
     }
 

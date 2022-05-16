@@ -67,4 +67,11 @@ class Integrai_Core_Helper_Data extends Mage_Core_Helper_Abstract  {
 
         return stripos($paymentMethod, 'integrai') === false ? 'checkout/success.phtml' : 'integrai/checkout/success.phtml';
     }
+
+    public function checkAuthorization($hash) {
+        $apiKey = $this->getConfig('api_key');
+        $secretKey = $this->getConfig('secret_key');
+        $token = base64_encode("{$apiKey}:{$secretKey}");
+        return $token === str_replace('Basic ', '', $hash);
+    }
 }

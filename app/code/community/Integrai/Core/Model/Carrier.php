@@ -22,10 +22,8 @@ class Integrai_Core_Model_Carrier
     {
         if ($this->_getHelper()->isEventEnabled(self::QUOTE)) {
             try{
-                $this->_getHelper()->log('Start');
                 $params = $this->prepareParamsRequest($request);
-                $this->_getHelper()->log('Start params', $params);
-                $services = $this->_getApi()->request('/quote/shipping', 'POST', $params);
+                $services = $this->_getApi()->sendEvent(self::QUOTE, $params, false, true);
                 /** @var Mage_Shipping_Model_Rate_Result $result */
                 $result = Mage::getModel('shipping/rate_result');
                 foreach ($services as $service) {

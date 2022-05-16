@@ -3,6 +3,8 @@
 class Integrai_Core_PixController
     extends Mage_Core_Controller_Front_Action
 {
+    const PIX = 'PIX';
+
     protected function _getHelper()
     {
         return Mage::helper('integrai');
@@ -20,9 +22,9 @@ class Integrai_Core_PixController
             $this->_getHelper()->log('Buscando pix url do pedido: ', $order_id);
 
             $api = Mage::getModel('integrai/api');
-            $response = $api->request('/store/pix', 'GET', null, array(
+            $response = $api->sendEvent(self::PIX, array(
                 'orderId' => $order_id,
-            ));
+            ), false, true);
 
             $this->getResponse()->setHeader('Content-type', 'application/json');
             $this->getResponse()->setBody(Mage::helper('core')->jsonEncode($response));

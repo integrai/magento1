@@ -11,6 +11,12 @@ class Integrai_Core_HealthController
     public function indexAction()
     {
         try{
+            if (!$this->_getHelper()->checkAuthorization($this->getRequest()->getHeader('Authorization'))) {
+                return $this->getResponse()->setHttpResponseCode(401)->setBody(Mage::helper('core')->jsonEncode(array(
+                    "error" => "Unauthorized"
+                )));
+            }
+
             $magentoVersion = Mage::getVersion();
             $moduleVersion = (array)Mage::getConfig()->getModuleConfig("Integrai_Core");
             $isRunningEventProcess = $this->_getHelper()->getConfigTable('PROCESS_EVENTS_RUNNING', null, 'RUNNING', false);
@@ -33,20 +39,10 @@ class Integrai_Core_HealthController
                 'totalUnsentEvent' => $totalUnsentEvent
             );
 
-            $api = Mage::getModel('integrai/api');
-
-            $api->request(
-                '/store/health',
-                'POST',
-                $data,
-            );
-
             $this->_getHelper()->log('Health executado');
 
             $this->getResponse()->setHeader('Content-type', 'application/json');
-            $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array(
-                'ok' => true
-            )));
+            $this->getResponse()->setBody(Mage::helper('core')->jsonEncode($data));
         } catch (Throwable $e) {
             $this->error_handling($e);
         } catch (Exception $e) {

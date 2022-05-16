@@ -3,6 +3,9 @@
 class Integrai_Core_BoletoController
     extends Mage_Core_Controller_Front_Action
 {
+
+    const BOLETO_URL = 'BOLETO_URL';
+
     protected function _getHelper()
     {
         return Mage::helper('integrai');
@@ -21,10 +24,10 @@ class Integrai_Core_BoletoController
             $this->_getHelper()->log('Buscando boleto url do pedido: ', $order_id);
 
             $api = Mage::getModel('integrai/api');
-            $response = $api->request('/store/boleto', 'GET', null, array(
+            $response = $api->sendEvent(self::BOLETO_URL, array(
                 'orderId' => $order_id,
                 'isDuplicate' => $is_duplicate
-            ));
+            ), false, true);
 
             $this->getResponse()->setHeader('Content-type', 'application/json');
             $this->getResponse()->setBody(Mage::helper('core')->jsonEncode($response));

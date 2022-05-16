@@ -11,9 +11,15 @@ class Integrai_Core_ConfigController
     public function indexAction()
     {
         try{
-            $this->_getHelper()->log('Buscando novas configurações...');
-            $api = Mage::getModel('integrai/api');
-            $configs = $api->request('/store/config');
+            if (!$this->_getHelper()->checkAuthorization($this->getRequest()->getHeader('Authorization'))) {
+                return $this->getResponse()->setHttpResponseCode(401)->setBody(Mage::helper('core')->jsonEncode(array(
+                    "error" => "Unauthorized"
+                )));
+            }
+
+            $this->_getHelper()->log('Salvando novas configurações...');
+
+            $configs = $data = json_decode($this->getRequest()->getRawBody(), true);
 
             foreach ($configs as $config) {
                 $configItem = Mage::getModel('integrai/config')
@@ -52,6 +58,12 @@ class Integrai_Core_ConfigController
     }
 
     public function attributesAction() {
+        if (!$this->_getHelper()->checkAuthorization($this->getRequest()->getHeader('Authorization'))) {
+            return $this->getResponse()->setHttpResponseCode(401)->setBody(Mage::helper('core')->jsonEncode(array(
+                "error" => "Unauthorized"
+            )));
+        }
+
         $attributes = Mage::getSingleton('eav/config')
             ->getEntityType(Mage_Catalog_Model_Product::ENTITY)
             ->getAttributeCollection()
@@ -62,10 +74,22 @@ class Integrai_Core_ConfigController
         /** @var  Mage_Eav_Model_Config $attribute */
         foreach ($attributes as $attribute) {
             $label = $attribute->getStoreLabel() ?: $attribute->getFrontendLabel();
+
             if ($label) {
+                $values = [];
+
+                if ($attribute->getFrontendInput() === "select") {
+                    foreach ($attribute->getSource()->getAllOptions() as $option) {
+                        if ($option['value'] && $option['label']) {
+                            $values[] = $option['label'];
+                        }
+                    }
+                }
+
                 $options[] = array(
+                    "code" => $attribute->getAttributeCode(),
                     "label" => $label,
-                    "value" => $attribute->getAttributeCode(),
+                    "values" => $values,
                 );
             }
         }
@@ -75,6 +99,12 @@ class Integrai_Core_ConfigController
     }
 
     public function categoriesAction() {
+        if (!$this->_getHelper()->checkAuthorization($this->getRequest()->getHeader('Authorization'))) {
+            return $this->getResponse()->setHttpResponseCode(401)->setBody(Mage::helper('core')->jsonEncode(array(
+                "error" => "Unauthorized"
+            )));
+        }
+
         $categories = $this->transformCategory(1);
         $this->getResponse()->setHeader('Content-type', 'application/json');
         $this->getResponse()->setBody(Mage::helper('core')->jsonEncode($categories));
